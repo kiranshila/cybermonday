@@ -12,9 +12,9 @@
                  :H6 :h6})
 
 (def parse-md
-  (insta/parser (clojure.java.io/resource "parse-md.bnf")))
+  (insta/parser (clojure.java.io/resource "commonmark.bnf")))
 
-(def test-text (slurp (clojure.java.io/resource "test.md")))
+(def test-text (slurp (clojure.java.io/resource "test_common.md")))
 
 (def ast (parse-md test-text))
 
@@ -30,9 +30,7 @@
 
 (defn ul-to-hiccup [[_ & lis]]
   [:ul (for [li lis]
-         (->> li
-              (cons :li)
-              (into [])))])
+         [:li (apply str (rest li))])])
 
 (defn blocks-to-hiccup [blocks]
   (->> (for [block blocks]
@@ -47,7 +45,7 @@
        (into [])))
 
 (defn parse-yaml [lines]
-  (yaml/parse-string (clojure.string/join "" lines)))
+  (yaml/parse-string (clojure.string/join "\n" lines)))
 
 (defn md-str-to-hiccup [md]
   (let [result (parse-md md)]
@@ -68,5 +66,5 @@
         (str "\n")
         (md-str-to-hiccup))))
 
-(def result (with-open [rdr (clojure.java.io/reader (clojure.java.io/resource "test.md"))]
+#_(def result (with-open [rdr (clojure.java.io/reader (clojure.java.io/resource "test.md"))]
               (parse-markdown (line-seq rdr) "---")))

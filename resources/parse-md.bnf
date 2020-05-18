@@ -1,18 +1,18 @@
-<Top> ::= (Block* Blankline*)*
+<Top> ::= (Block | Blankline)*
 <Block> ::= Paragraph | Header | List
 List ::= Listline+ Blankline+
 Listline = Listmarker <Whitespace+> Word (Whitespace Word)* EOL
 <Listmarker> ::= <'+' | '*' | '-'>
-Header ::= (H1 | H2 | H3 | H4 | H5 | H6) Blankline*
+Header ::= (H1 | H2 | H3 | H4 | H5 | H6) Blankline* EOL
 H1 ::= Line <'='+> | <'#'> <Whitespace+> LineMid <'#'*>
 H2 ::= Line <'-'+> | <'##'> <Whitespace+> LineMid <'#'*>
 H3 ::= <'###'> Whitespace+ LineMid <'#'*>
 H4 ::= <'####'> Whitespace+ LineMid <'#'*>
 H5 ::= <'#####'> Whitespace+ LineMid <'#'*>
 H6 ::= <'######'> Whitespace+ LineMid <'#'*>
-Paragraph ::= Line+ !Line Blankline*
+Paragraph ::= Line+ !Line
 <Blankline> ::= Whitespace* EOL
-<LineMid> ::= Word (Whitespace Word)* Whitespace?
+<LineMid> ::= Word (Whitespace Word)* Whitespace*
 Line ::= Linepre LineMid EOL
 <Linepre> ::= <#" ? ? ?">
 <Word> ::= #"\S+"
