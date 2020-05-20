@@ -1,0 +1,27 @@
+<Document> ::= Block*
+<Block> ::= LeafBlock
+<LeafBlock> ::= hr (*ThematicBreak*)
+              / Header
+              / Blankline
+              / Line
+
+<Header> ::= UpToThreeSpaces (h1 | h2 | h3 | h4 | h5 | h6) EOL
+<HeaderContent> ::= <' ' #"[ \t]*"> #"(?m)((?![ \t]+#* *$)[^\n\r])+"? <#"[ \t]*#* *">
+h1 ::= <'#'> HeaderContent?
+h2 ::= <'##'> HeaderContent?
+h3 ::= <'###'> HeaderContent?
+h4 ::= <'####'> HeaderContent?
+h5 ::= <'#####'> HeaderContent?
+h6 ::= <'######'> HeaderContent?
+
+hr ::= <UpToThreeSpaces (ThematicBreakUnderscore | ThematicBreakHyphen | ThematicBreakStar) EOL>
+ThematicBreakUnderscore ::= '_' SpaceTab* '_' SpaceTab* '_' SpaceTab* ('_' SpaceTab*)*
+ThematicBreakHyphen ::= '-' SpaceTab* '-' SpaceTab* '-' SpaceTab* ('-' SpaceTab*)*
+ThematicBreakStar ::= '*' SpaceTab* '*' SpaceTab* '*' SpaceTab* ('*' SpaceTab*)*
+
+Blankline ::= SpaceTab* EOL
+<UpToThreeSpaces> ::= <#"^[ ]{0,3}">
+<SpaceTab> ::= <' ' | '\t'>
+Whitespace ::= #"\s*"
+<EOL> ::= <'\r\n' / '\n' / '\r' / #"\z">
+Line ::= #".*" EOL
