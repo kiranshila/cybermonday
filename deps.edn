@@ -4,7 +4,9 @@
         clj-commons/clj-yaml {:mvn/version "0.7.0"}}
  :aliases
  {:test {:extra-paths ["test"]
-         :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}}}
+         :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
+                      org.jsoup/jsoup {:mvn/version "1.13.1"}
+                      hickory {:mvn/version "0.7.1"}}}
   :runner
   {:extra-deps {com.cognitect/test-runner
                 {:git/url "https://github.com/cognitect-labs/test-runner"
