@@ -1,6 +1,5 @@
 (ns kiranshila.cybermonday
   (:require
-   [instaparse.core :as insta]
    [clj-yaml.core :as yaml]
    [clojure.string :as s]
    [hickory.core :as h])

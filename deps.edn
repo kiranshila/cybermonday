@@ -1,13 +1,11 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
-        instaparse {:mvn/version "1.4.10"}
         clj-commons/clj-yaml {:mvn/version "0.7.0"}
-        com.vladsch.flexmark/flexmark-all {:mvn/version "0.61.30"}}
+        com.vladsch.flexmark/flexmark-all {:mvn/version "0.61.30"}
+        hickory {:mvn/version "0.7.1"}}
  :aliases
  {:test {:extra-paths ["test"]
-         :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}
-                      org.jsoup/jsoup {:mvn/version "1.13.1"}
-                      hickory {:mvn/version "0.7.1"}}}
+         :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}}}
   :runner
   {:extra-deps {com.cognitect/test-runner
                 {:git/url "https://github.com/cognitect-labs/test-runner"
