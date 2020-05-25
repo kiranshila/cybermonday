@@ -1,8 +1,8 @@
 (ns kiranshila.cybermonday
   (:require
    [clj-yaml.core :as yaml]
-   [clojure.string :as s]
-   [hickory.core :as h])
+   [hickory.core :as h]
+   [clojure.string :as str])
   (:gen-class)
   (:import
    (com.vladsch.flexmark.util.ast Node Document)
@@ -73,7 +73,7 @@
   ListItem
   (to-hiccup [this]
     (if (every? #(instance? Paragraph %) (.getChildren this))
-      [:li (s/trim (s/join (map #(.getChars %) (.getChildren this))))]
+      [:li (str/trim (str/join (map #(.getChars %) (.getChildren this))))]
       (make-hiccup-node (node-to-tag this) (map to-hiccup (.getChildren this)))))
   SoftLineBreak
   (to-hiccup [this]
@@ -89,7 +89,7 @@
   TableCell
   (to-hiccup [this]
     (if-let [alignment (.getAlignment this)]
-      (make-hiccup-node (if (.isHeader this) :th :td) {:align (s/lower-case (str alignment))} (map to-hiccup (.getChildren this)))
+      (make-hiccup-node (if (.isHeader this) :th :td) {:align (str/lower-case (str alignment))} (map to-hiccup (.getChildren this)))
       (make-hiccup-node (if (.isHeader this) :th :td) (map to-hiccup (.getChildren this)))))
   HtmlBlockBase
   (to-hiccup [this]
@@ -126,19 +126,29 @@
     (to-hiccup document)))
 
 (defn parse-yaml [lines]
-  (yaml/parse-string (clojure.string/join "\n" lines)))
+  (yaml/parse-string (str/join "\n" lines)))
 
-(defn parse-metadata [lines sep]
-  (let [[first-line & lines] lines]
-    (if (= sep first-line)
-      (parse-yaml (take-while #(not= sep %) lines))
+(defn parse-toml [lines]
+  {} ;FIXME
+  )
+
+(def meta-seps {"---" parse-yaml "+++" parse-toml})
+
+(defn parse-metadata
+  "Parses a markdown string into metadata (edn), returns an empty map if none"
+  [md-str]
+  (let [lines (str/split-lines md-str)]
+    (if (contains? meta-seps (first lines))
+      ((get meta-seps (first lines)) (take-while #(not= (first lines) %) (rest lines)))
       {})))
 
-(defn parse-markdown [lines sep]
-  (let [[first-line & rest-lines] lines
-        result-lines (if (= sep first-line)
-                       (drop 1 (drop-while #(not= sep %) rest-lines))
-                       lines)]
-    (-> (clojure.string/join "\n" result-lines)
-        (str "\n")
-        md-to-hiccup)))
+(defn parse-markdown
+  "Parses a markdown string into hiccup, ignoring leading metadata"
+  [md-str]
+  (let [lines (str/split-lines md-str)
+        md-lines (if (contains? meta-seps (first lines))
+                   (->> (drop-while #(not= (first lines) %) (rest lines))
+                        (drop 1))
+                   lines)]
+    (-> (str/join "\n" md-lines)
+        (md-to-hiccup))))
