@@ -12,11 +12,13 @@
     BlockQuote CodeBlock FencedCodeBlock Heading HtmlBlockBase IndentedCodeBlock
     BulletList OrderedList BulletListItem OrderedListItem Paragraph ThematicBreak
     Code Emphasis StrongEmphasis HardLineBreak HtmlEntity HtmlInlineBase Text ListItem
-    SoftLineBreak BlockQuote Link LinkRef Reference AutoLink LinkNodeBase MailLink HtmlInline)
+    SoftLineBreak BlockQuote Link LinkRef Reference AutoLink LinkNodeBase MailLink HtmlInline
+    HtmlCommentBlock)
    (com.vladsch.flexmark.ext.tables
     TablesExtension TableBlock TableHead TableRow TableCell TableBody TableBody TableSeparator)
    (com.vladsch.flexmark.ext.gfm.strikethrough StrikethroughExtension Strikethrough)
-   (com.vladsch.flexmark.ext.attributes AttributesExtension AttributesNode)))
+   (com.vladsch.flexmark.ext.attributes AttributesExtension AttributesNode)
+   (com.vladsch.flexmark.test.util AstCollectingVisitor)))
 
 (def options (.. (MutableDataSet.)
                  (set Parser/EXTENSIONS
@@ -24,7 +26,12 @@
                        (StrikethroughExtension/create)
                        (AttributesExtension/create)])
                  (toImmutable)))
+
 (def parser (.build (Parser/builder options)))
+
+(defn print-ast [document]
+  (println (.. (AstCollectingVisitor.)
+               (collectAndGetAstText document))))
 
 (def node-tags
   {Paragraph :p
@@ -46,7 +53,7 @@
    BlockQuote :blockquote})
 
 (defprotocol HiccupRepresentable
-  (to-hiccup [this]))
+  (to-hiccup [this options]))
 
 (defn node-to-tag [node]
   (or (node-tags (type node))
@@ -58,52 +65,108 @@
   ([tag attrs children]
    (apply vector tag attrs (filter identity children))))
 
+(defn map-children-to-hiccup [node options]
+  (map #(to-hiccup % options) (.getChildren node)))
+
+(defn highlight-js-code-block-no-jupyter [language child-hiccup]
+  (let [lang (str/join (str/split language #"jupyter-"))]
+    (if (not-empty lang)
+      [:pre (make-hiccup-node :code {:class lang} child-hiccup)]
+      [:pre (make-hiccup-node :code child-hiccup)])))
+
+(defn hiccup? [element]
+  (and (vector? element)
+       (keyword? (first element))))
+
+(defn close-tag? [tag]
+  (when (string? tag)
+    (and (= \/ (second tag))
+         (not (empty? (re-matches #"<(.*)>" tag))))))
+
+(defn open-tag? [tag]
+  (when (string? tag)
+    (and (not= \/ (second tag))
+         (not (empty? (re-matches #"<(.*)>" tag))))))
+
+(defn contains-open-tag? [vec]
+  (some open-tag? vec))
+
+(defn contains-close-tag? [vec]
+  (some close-tag? vec))
+
+(defn contains-html-vec-open-tag? [vec]
+  (when (vector? vec)
+    (some contains-open-tag? vec)))
+
+(defn contains-html-vec-close-tag? [vec]
+  (when (vector? vec)
+    (some contains-close-tag? vec)))
+
+(defn html-attr-to-map [attr]
+  (let [[key value] (str/split attr #"=")]
+    (hash-map (keyword key) value)))
+
+(defn parse-tag [tag]
+  (let [[tag-name & attributes] (str/split (second (re-matches #"<(.*)>" tag)) #" ")]
+    (if (open-tag? tag)
+      (if (some? attributes)
+        [(keyword tag-name) (apply merge (map html-attr-to-map attributes))]
+        [(keyword tag-name)])
+      [(keyword (apply str (rest tag-name)))])))
+
 (extend-protocol HiccupRepresentable
   Node
-  (to-hiccup [this]
-    (make-hiccup-node (node-to-tag this) (map to-hiccup (.getChildren this))))
+  (to-hiccup [this options]
+    (make-hiccup-node (node-to-tag this)
+                      (map-children-to-hiccup this options)))
   Text
-  (to-hiccup [this]
+  (to-hiccup [this options]
     (str (.getChars this)))
   Heading
-  (to-hiccup [this]
+  (to-hiccup [this options]
     (if (not-empty (.getAnchorRefId this))
-      (make-hiccup-node (keyword (str "h" (.getLevel this))) {:id (str (.getAnchorRefId this))} (map to-hiccup (.getChildren this)))
-      (make-hiccup-node (keyword (str "h" (.getLevel this))) (map to-hiccup (.getChildren this)))))
+      (make-hiccup-node (keyword (str "h" (.getLevel this)))
+                        {:id (str (.getAnchorRefId this))}
+                        (map-children-to-hiccup this options))
+      (make-hiccup-node (keyword (str "h" (.getLevel this)))
+                        (map-children-to-hiccup this options))))
   ListItem
-  (to-hiccup [this]
+  (to-hiccup [this options]
     (if (every? #(instance? Paragraph %) (.getChildren this))
       [:li (str/trim (str/join (map #(.getChars %) (.getChildren this))))]
-      (make-hiccup-node (node-to-tag this) (map to-hiccup (.getChildren this)))))
+      (make-hiccup-node (node-to-tag this) (map-children-to-hiccup this options))))
   SoftLineBreak
-  (to-hiccup [this]
-    "\n")
+  (to-hiccup [this options] "\n")
   FencedCodeBlock
-  (to-hiccup [this]
-    [:pre (make-hiccup-node :code {:class (str (.getInfo this))} (map to-hiccup (.getChildren this)))])
+  (to-hiccup [this options]
+    ((:code-format options) (str (.getInfo this)) (map-children-to-hiccup this options)))
   IndentedCodeBlock
-  (to-hiccup [this]
+  (to-hiccup [this options]
     [:pre [:code (str (.getContentChars this))]])
   TableSeparator
-  (to-hiccup [this] nil)
+  (to-hiccup [this options] nil)
   TableCell
-  (to-hiccup [this]
+  (to-hiccup [this options]
     (if-let [alignment (.getAlignment this)]
-      (make-hiccup-node (if (.isHeader this) :th :td) {:align (str/lower-case (str alignment))} (map to-hiccup (.getChildren this)))
-      (make-hiccup-node (if (.isHeader this) :th :td) (map to-hiccup (.getChildren this)))))
+      (make-hiccup-node (if (.isHeader this) :th :td)
+                        {:align (str/lower-case (str alignment))}
+                        (map-children-to-hiccup this options))
+      (make-hiccup-node (if (.isHeader this) :th :td)
+                        (map-children-to-hiccup this options))))
   HtmlBlockBase
-  (to-hiccup [this]
+  (to-hiccup [this options]
     (h/as-hiccup (first (h/parse-fragment (str (.getContentChars this))))))
   Link
-  (to-hiccup [this]
+  (to-hiccup [this options]
     (make-hiccup-node :a (if (empty? (.getTitle this))
                            {:href (str (.getUrl this))}
                            {:href (str (.getUrl this))
-                            :title (str (.getTitle this))}) (map to-hiccup (.getChildren this))))
+                            :title (str (.getTitle this))})
+                      (map-children-to-hiccup this options)))
   Reference
-  (to-hiccup [this] nil)
+  (to-hiccup [this options] nil)
   LinkRef
-  (to-hiccup [this]
+  (to-hiccup [this options]
     (let [ref (-> this
                   .getDocument
                   (.get Parser/REFERENCES)
@@ -111,19 +174,26 @@
       (make-hiccup-node :a (if (empty? (.getTitle ref))
                              {:href (str (.getUrl ref))}
                              {:href (str (.getUrl ref))
-                              :title (str (.getTitle ref))}) (map to-hiccup (.getChildren this)))))
+                              :title (str (.getTitle ref))})
+                        (map-children-to-hiccup this options))))
   AutoLink
-  (to-hiccup [this]
+  (to-hiccup [this options]
     [:a {:href (str (.getUrl this))} (str (.getUrl this))])
   MailLink
-  (to-hiccup [this]
+  (to-hiccup [this options]
     [:a {:href (str "mailto:" (.getText this))} (str (.getText this))])
   AttributesNode
-  (to-hiccup [this] nil))
+  (to-hiccup [this options] nil)
+  HtmlInline
+  (to-hiccup [this options]
+    (make-hiccup-node :hmtl (str (.getChars this)) (map-children-to-hiccup this options)))
+  HtmlCommentBlock
+  (to-hiccup [this options] nil))
 
-(defn md-to-hiccup [md]
+(defn md-to-hiccup [md options]
   (let [document (.parse parser md)]
-    (to-hiccup document)))
+    document
+    #_(to-hiccup document options)))
 
 (defn parse-yaml [lines]
   (yaml/parse-string (str/join "\n" lines)))
@@ -144,11 +214,36 @@
 
 (defn parse-markdown
   "Parses a markdown string into hiccup, ignoring leading metadata"
-  [md-str]
+  [md-str & {:as options}]
   (let [lines (str/split-lines md-str)
         md-lines (if (contains? meta-seps (first lines))
                    (->> (drop-while #(not= (first lines) %) (rest lines))
                         (drop 1))
                    lines)]
     (-> (str/join "\n" md-lines)
-        (md-to-hiccup))))
+        (md-to-hiccup (merge options {:code-format highlight-js-code-block-no-jupyter})))))
+
+(def test-form [[:html "<strong>"] "Foo" [:em "Bar"] [:html "<p class=underlined>"] "This is some text" [:html "</p>"] [:html "</strong>"]])
+
+(defn fold-inline-html [xf]
+  (let [state (volatile! [])]
+    (completing
+     (fn [r input]
+       (cond
+         (contains-open-tag? input) (do
+                                      (vswap! state conj (parse-tag (second input)))
+                                      r)
+         (contains-close-tag? input) (let [thing (peek @state)]
+                                       (vswap! state pop)
+                                       (if (empty? @state)
+                                         (xf r thing)
+                                         (do
+                                           (vswap! state update (dec (count @state)) conj thing)
+                                           r)))
+         :else (if (empty? @state)
+                 (xf r input)
+                 (do
+                   (vswap! state update (dec (count @state)) conj input)
+                   r)))))))
+
+(into [:div] fold-inline-html test-form)
