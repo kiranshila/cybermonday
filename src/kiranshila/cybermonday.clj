@@ -89,22 +89,23 @@
          (not (empty? (re-matches #"<(.*)>" tag))))))
 
 (defn contains-open-tag? [vec]
-  (some open-tag? vec))
+  (when (vector? vec)
+    (some open-tag? vec)))
 
 (defn contains-close-tag? [vec]
-  (some close-tag? vec))
-
-(defn contains-html-vec-open-tag? [vec]
   (when (vector? vec)
-    (some contains-open-tag? vec)))
+    (some close-tag? vec)))
 
-(defn contains-html-vec-close-tag? [vec]
-  (when (vector? vec)
-    (some contains-close-tag? vec)))
+(defn contains-inner-html? [vec]
+  (when (some vector? vec)
+    (some #(and (vector? %1) (open-tag? (second %1))) vec)))
 
 (defn html-attr-to-map [attr]
   (let [[key value] (str/split attr #"=")]
-    (hash-map (keyword key) value)))
+    (hash-map (keyword key) (let [trimmed-value (str/trim value)]
+                              (if (= \" (first trimmed-value))
+                                (subs trimmed-value 1 (dec (.length trimmed-value)))
+                                trimmed-value)))))
 
 (defn parse-tag [tag]
   (let [[tag-name & attributes] (str/split (second (re-matches #"<(.*)>" tag)) #" ")]
@@ -190,10 +191,50 @@
   HtmlCommentBlock
   (to-hiccup [this options] nil))
 
+(defn fold-inline-html [xf]
+  (let [state (volatile! [])]
+    (completing
+     (fn [r input]
+       (cond
+         (contains-open-tag? input) (do
+                                      (vswap! state conj (parse-tag (second input)))
+                                      r)
+         (contains-close-tag? input) (let [thing (peek @state)]
+                                       (vswap! state pop)
+                                       (if (empty? @state)
+                                         (xf r thing)
+                                         (do
+                                           (vswap! state update (dec (count @state)) conj thing)
+                                           r)))
+         :else (if (empty? @state)
+                 (xf r input)
+                 (do
+                   (vswap! state update (dec (count @state)) conj input)
+                   r)))))))
+
+(defn process-inline-html [almost-hiccup]
+  (clojure.walk/postwalk (fn [item]
+                           (if (hiccup? item)
+                             (if (contains-inner-html? item)
+                               (into [] fold-inline-html item)
+                               item)
+                             item))
+                         almost-hiccup))
+
+(defn cleanup-whitespace [hiccup]
+  (clojure.walk/postwalk (fn [item]
+                           (cond
+                             (string? item) (when (not (str/blank? item))
+                                              (str/trim item))
+                             (vector? item) (filterv identity item)
+                             :else item))
+                         hiccup))
+
 (defn md-to-hiccup [md options]
   (let [document (.parse parser md)]
-    document
-    #_(to-hiccup document options)))
+    (cond->> (to-hiccup document options)
+      (:inline-html options) process-inline-html
+      (:remove-whitespace options) cleanup-whitespace)))
 
 (defn parse-yaml [lines]
   (yaml/parse-string (str/join "\n" lines)))
@@ -221,29 +262,6 @@
                         (drop 1))
                    lines)]
     (-> (str/join "\n" md-lines)
-        (md-to-hiccup (merge options {:code-format highlight-js-code-block-no-jupyter})))))
-
-(def test-form [[:html "<strong>"] "Foo" [:em "Bar"] [:html "<p class=underlined>"] "This is some text" [:html "</p>"] [:html "</strong>"]])
-
-(defn fold-inline-html [xf]
-  (let [state (volatile! [])]
-    (completing
-     (fn [r input]
-       (cond
-         (contains-open-tag? input) (do
-                                      (vswap! state conj (parse-tag (second input)))
-                                      r)
-         (contains-close-tag? input) (let [thing (peek @state)]
-                                       (vswap! state pop)
-                                       (if (empty? @state)
-                                         (xf r thing)
-                                         (do
-                                           (vswap! state update (dec (count @state)) conj thing)
-                                           r)))
-         :else (if (empty? @state)
-                 (xf r input)
-                 (do
-                   (vswap! state update (dec (count @state)) conj input)
-                   r)))))))
-
-(into [:div] fold-inline-html test-form)
+        (md-to-hiccup (merge options {:code-format highlight-js-code-block-no-jupyter
+                                      :inline-html true
+                                      :remove-whitespace true})))))
