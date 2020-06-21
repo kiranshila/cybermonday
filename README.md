@@ -26,13 +26,15 @@ Run that uberjar:
 
     $ java -jar cybermonday.jar
 
-## Options
+## Major Caveats
 
-FIXME: listing of options this app accepts.
+The inline html parser is really rudimentary. Weird edge cases most certainly will not work. They pretty much must follow the `<tag foo="bar"> Content </tag>` syntax to be properly rendered. However, the inline hmtl parsing happens after the markdown parsing, so having markdown within the inline html is totally valid.
 
-## Examples
+Another breaking example is if the attributes of a tag contain `=` in the value of the attribute. I'm splitting the attributes up by the `=`, so any random `=` that doesn't separate the key and the value will break the parser.
 
-...
+## Shortcodes
+
+I wanted the support of a couple hugo shortcodes, so I added a shortcode processor as well. There are caveats with this though: Mainly, markdown inside the shortcodes just won't work.
 
 ### Bugs
 

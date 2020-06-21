@@ -68,6 +68,14 @@ And some code in another language
 
 `not this` `some code`
 
+If $`a^2=b`$ and $`b=2`$, then the solution must be either
+```math
+a =+\sqrt{2}
+``` 
+or
+```math
+a =-\sqrt{2}
+```
 
 ```jupyter-python
 [[1,2,3],[4,5,6],[7,8,0]]

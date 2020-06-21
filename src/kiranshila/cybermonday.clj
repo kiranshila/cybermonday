@@ -2,7 +2,8 @@
   (:require
    [clj-yaml.core :as yaml]
    [hickory.core :as h]
-   [clojure.string :as str])
+   [clojure.string :as str]
+   [clojure.walk :as walk])
   (:gen-class)
   (:import
    (com.vladsch.flexmark.util.ast Node Document)
@@ -13,18 +14,20 @@
     BulletList OrderedList BulletListItem OrderedListItem Paragraph ThematicBreak
     Code Emphasis StrongEmphasis HardLineBreak HtmlEntity HtmlInlineBase Text ListItem
     SoftLineBreak BlockQuote Link LinkRef Reference AutoLink LinkNodeBase MailLink HtmlInline
-    HtmlCommentBlock)
+    HtmlCommentBlock HtmlEntity)
    (com.vladsch.flexmark.ext.tables
     TablesExtension TableBlock TableHead TableRow TableCell TableBody TableBody TableSeparator)
    (com.vladsch.flexmark.ext.gfm.strikethrough StrikethroughExtension Strikethrough)
    (com.vladsch.flexmark.ext.attributes AttributesExtension AttributesNode)
-   (com.vladsch.flexmark.test.util AstCollectingVisitor)))
+   (com.vladsch.flexmark.test.util AstCollectingVisitor)
+   (com.vladsch.flexmark.ext.gitlab GitLabExtension GitLabInlineMath)))
 
 (def options (.. (MutableDataSet.)
                  (set Parser/EXTENSIONS
                       [(TablesExtension/create)
                        (StrikethroughExtension/create)
-                       (AttributesExtension/create)])
+                       (AttributesExtension/create)
+                       (GitLabExtension/create)])
                  (toImmutable)))
 
 (def parser (.build (Parser/builder options)))
@@ -52,6 +55,8 @@
    TableRow :tr
    BlockQuote :blockquote})
 
+(def summary-divider "<!--more-->")
+
 (defprotocol HiccupRepresentable
   (to-hiccup [this options]))
 
@@ -71,7 +76,9 @@
 (defn highlight-js-code-block-no-jupyter [language child-hiccup]
   (let [lang (str/join (str/split language #"jupyter-"))]
     (if (not-empty lang)
-      [:pre (make-hiccup-node :code {:class lang} child-hiccup)]
+      (if (= "latex" lang)
+        (make-hiccup-node :span {:class "block-math"} child-hiccup)
+        [:pre (make-hiccup-node :code {:class lang} child-hiccup)])
       [:pre (make-hiccup-node :code child-hiccup)])))
 
 (defn hiccup? [element]
@@ -108,7 +115,7 @@
                                 trimmed-value)))))
 
 (defn parse-tag [tag]
-  (let [[tag-name & attributes] (str/split (second (re-matches #"<(.*)>" tag)) #" ")]
+  (let [[tag-name & attributes] (str/split (second (re-matches #"<(.*)>" tag)) #"\s+(?=\S+=)")]
     (if (open-tag? tag)
       (if (some? attributes)
         [(keyword tag-name) (apply merge (map html-attr-to-map attributes))]
@@ -137,7 +144,7 @@
       [:li (str/trim (str/join (map #(.getChars %) (.getChildren this))))]
       (make-hiccup-node (node-to-tag this) (map-children-to-hiccup this options))))
   SoftLineBreak
-  (to-hiccup [this options] "\n")
+  (to-hiccup [this options] [:br])
   FencedCodeBlock
   (to-hiccup [this options]
     ((:code-format options) (str (.getInfo this)) (map-children-to-hiccup this options)))
@@ -168,15 +175,16 @@
   (to-hiccup [this options] nil)
   LinkRef
   (to-hiccup [this options]
-    (let [ref (-> this
-                  .getDocument
-                  (.get Parser/REFERENCES)
-                  (get (str (.getReference this))))]
+    (if-let [ref (-> this
+                     .getDocument
+                     (.get Parser/REFERENCES)
+                     (get (str (.getReference this))))]
       (make-hiccup-node :a (if (empty? (.getTitle ref))
                              {:href (str (.getUrl ref))}
                              {:href (str (.getUrl ref))
                               :title (str (.getTitle ref))})
-                        (map-children-to-hiccup this options))))
+                        (map-children-to-hiccup this options))
+      (str (.getChars this))))
   AutoLink
   (to-hiccup [this options]
     [:a {:href (str (.getUrl this))} (str (.getUrl this))])
@@ -189,7 +197,19 @@
   (to-hiccup [this options]
     (make-hiccup-node :hmtl (str (.getChars this)) (map-children-to-hiccup this options)))
   HtmlCommentBlock
-  (to-hiccup [this options] nil))
+  (to-hiccup [this options]
+    (when (str/includes? (str (.getChars this)) summary-divider)
+      [:div {:id "more"}]))
+  GitLabInlineMath
+  (to-hiccup [this options]
+    [:span {:class "inline-math"} (str (.getText this))])
+  HtmlEntity
+  (to-hiccup [this options]
+    (->> (.getChars this)
+         str
+         h/parse-fragment
+         first
+         str)))
 
 (defn fold-inline-html [xf]
   (let [state (volatile! [])]
@@ -213,28 +233,99 @@
                    r)))))))
 
 (defn process-inline-html [almost-hiccup]
-  (clojure.walk/postwalk (fn [item]
-                           (if (hiccup? item)
-                             (if (contains-inner-html? item)
-                               (into [] fold-inline-html item)
-                               item)
-                             item))
-                         almost-hiccup))
+  (walk/postwalk (fn [item]
+                   (if (hiccup? item)
+                     (if (contains-inner-html? item)
+                       (into [] fold-inline-html item)
+                       item)
+                     item))
+                 almost-hiccup))
 
 (defn cleanup-whitespace [hiccup]
-  (clojure.walk/postwalk (fn [item]
-                           (cond
-                             (string? item) (when (not (str/blank? item))
-                                              (str/trim item))
-                             (vector? item) (filterv identity item)
-                             :else item))
-                         hiccup))
+  (walk/postwalk (fn [item]
+                   (cond
+                     (string? item) (when (not (str/blank? item))
+                                      item)
+                     (vector? item) (filterv identity item)
+                     :else item))
+                 hiccup))
+
+(def shortcode-re #"\{\{<(.*)>\}\}")
+(def inline-math-re #"\\\\\((.*?)\\\\\)")
+(def block-math-re #"\\\\\[(.*?)\\\\\]")
+
+(defn preprocess-math [file-str]
+  (-> file-str
+      (str/replace inline-math-re #(str "$`" (second %) "`$"))
+      (str/replace block-math-re #(str "```latex\n" (second %) "\n```"))))
+
+(defn shortcode? [string]
+  (when (string? string)
+    (not (empty? (re-matches shortcode-re string)))))
+
+(defn shortcode-name [shortcode]
+  (-> (second (re-matches shortcode-re shortcode))
+      (str/split #"\s+(?=\S+=)")
+      first
+      str/trim))
+
+(defn shortcode-attrs [shortcode]
+  (into {} (map html-attr-to-map
+                (-> (second (re-matches shortcode-re shortcode))
+                    (str/split #"\s+(?=\S+=)")
+                    rest))))
+
+(defn shortcode-figure [shortcode]
+  (let [{:keys [class src alt width height link
+                rel title caption attrlink attr]}
+        (shortcode-attrs shortcode)]
+    (make-hiccup-node
+     :figure
+     [(when class {:class class})
+      (let [img [:img (merge {:src src}
+                             (when alt {:alt alt})
+                             (when width {:width width})
+                             (when height {:height height}))]]
+        (if link
+          [:a (merge {:href link}
+                     (when rel (:rel rel)))
+           img]
+          img))
+      (when (or title caption attr)
+        (make-hiccup-node
+         :figcaption
+         [(when title
+            [:h4 title])
+          (when (or caption attr)
+            (make-hiccup-node
+             :p
+             [caption
+              (if attrlink
+                [:a {:href attrlink} attr]
+                attr)]))]))])))
+
+(def parse-shortcode
+  {"figure" shortcode-figure})
+
+(defn process-shortcodes [hiccup]
+  (walk/postwalk (fn [item]
+                   (if (vector? item)
+                     (if (some shortcode? item)
+                       (let [shortcodes (for [sc-hiccup (filter shortcode? item)]
+                                          ((get parse-shortcode (shortcode-name sc-hiccup)) sc-hiccup))]
+                         (make-hiccup-node :div (concat
+                                                 shortcodes
+                                                 [(filterv #(not (shortcode? %)) item)])))
+                       item)
+                     item))
+                 hiccup))
 
 (defn md-to-hiccup [md options]
   (let [document (.parse parser md)]
     (cond->> (to-hiccup document options)
       (:inline-html options) process-inline-html
-      (:remove-whitespace options) cleanup-whitespace)))
+      (:remove-whitespace options) cleanup-whitespace
+      (:process-shortcodes options) process-shortcodes)))
 
 (defn parse-yaml [lines]
   (yaml/parse-string (str/join "\n" lines)))
@@ -262,6 +353,8 @@
                         (drop 1))
                    lines)]
     (-> (str/join "\n" md-lines)
+        preprocess-math
         (md-to-hiccup (merge options {:code-format highlight-js-code-block-no-jupyter
                                       :inline-html true
-                                      :remove-whitespace true})))))
+                                      :remove-whitespace true
+                                      :process-shortcodes true})))))
