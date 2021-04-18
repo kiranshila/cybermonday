@@ -1,13 +1,15 @@
 {:paths ["src" "resources"]
- :deps {org.clojure/clojure {:mvn/version "1.10.1"}
-        clj-commons/clj-yaml {:mvn/version "0.7.0"}
+ :deps {org.clojure/clojure {:mvn/version "1.10.3"}
+        clj-commons/clj-yaml {:mvn/version "0.7.106"}
         com.vladsch.flexmark/flexmark {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-ext-tables {:mvn/version "0.62.2"}
+        com.vladsch.flexmark/flexmark-ext-definition {:mvn/version "0.62.2"}
+        com.vladsch.flexmark/flexmark-ext-footnotes {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-ext-gfm-strikethrough {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-ext-attributes {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-test-util {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-ext-gitlab {:mvn/version "0.62.2"}
-        hickory {:mvn/version "0.7.1"}}
+        hickory/hickory {:mvn/version "0.7.1"}}
  :aliases
  {:test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "0.10.0"}}}
@@ -19,4 +21,4 @@
                "-d" "test"]}
   :uberjar {:extra-deps {seancorfield/depstar {:mvn/version "0.5.2"}}
             :main-opts ["-m" "hf.depstar.uberjar" "cybermonday.jar"
-                        "-C" "-m" "kiranshila.cybermonday"]}}}
+                        "-C" "-m" "cybermonday"]}}}
