@@ -5,7 +5,7 @@
   <artifactId>${ARTIFACT_ID}</artifactId>
   <version>LATEST</version>
   <name>${PROJECT_NAME}</name>
-  <description>A description</description>
+  <description>A Markdown to clojure parser</description>
   <url>https://github.com/$USER/$PROJECT</url>
 
   <licenses>
@@ -17,7 +17,7 @@
 
   <developers>
     <developer>
-      <name>Your name</name>
+      <name>Kiran Shila</name>
     </developer>
   </developers>
 
