@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-        
+            
+  
+  
   
   
   <modelVersion>4.0.0</modelVersion>
-        
+            
   
   
-  <groupId>com.github.kiranshila</groupId>
-        
+  
+  
+  <groupId>com.kiranshila</groupId>
+            
+  
+  
   
   
   <artifactId>cybermonday</artifactId>
-        
+            
   
   
-  <version>0.0.3</version>
-        
+  
+  
+  <version>0.0.4</version>
+            
+  
+  
   
   
   <name>cybermonday</name>
-        
+            
+  
+  
   
   
   <dependencies>
@@ -136,41 +148,63 @@
     </dependency>
       
   </dependencies>
-        
+            
+  
+  
   
   
   <build>
-                
+                        
+    
+    
     
     
     <sourceDirectory>src</sourceDirectory>
-              
+                      
+  
+  
   
   
   </build>
-        
+            
+  
+  
   
   
   <repositories/>
-      
+          
+  
+  
   
   
   <scm>
-            
+                    
+    
+    
     
     <url>https://github.com/kiranshila/cybermonday</url>
-            
+                    
     
-    <tag>f44601ba386fd1b9b1c3c40f889b6d8484bc8a60</tag>
-            
+    
+    
+    <tag>8f1827ea58a21ecc278677729dddfdb1c794c766</tag>
+                    
+    
+    
     
     <connection>scm:git:git@github.com:kiranshila/cybermonday.git</connection>
-            
+                    
+    
+    
     
     <developerConnection>scm:git:git@github.com:kiranshila/cybermonday.git</developerConnection>
-          
+                  
+  
+  
   
   </scm>
-    
+        
+
+
 
 </project>
