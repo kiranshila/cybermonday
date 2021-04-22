@@ -1,5 +1,6 @@
 # cybermonday
-
+[![Clojars Project](https://img.shields.io/clojars/v/com.github.kiranshila/cybermonday.svg)](https://clojars.org/com.github.kiranshila/cybermonday)
+[![cljdoc badge](https://cljdoc.org/badge/com.github.kiranshila/cybermonday)](https://cljdoc.org/d/com.github.kiranshila/cybermonday/CURRENT)
 A markdown (extended CommonMark) to Clojure data (hiccup) parser.
 
 I've been frustrated with the space of Markdown manipulation in Clojure. Most
@@ -31,9 +32,6 @@ I'm using this library on my blog at kiranshila.com - please let me know if you
 run into any issues.
 
 For more details, check out the docs!
-
-[![cljdoc badge](https://cljdoc.org/badge/com.kiranshila/cybermonday)](https://cljdoc.org/d/com.kiranshila/cybermonday/CURRENT)
-
 
 ## Major Caveats
 
