@@ -19,7 +19,7 @@ pipeline.
 To overcome this, I wrote `cybermonday`! It was originally going to be a parser
 for blackfriday markdown, but as I realized the markdown spec is insane, it made
 more sense to wrap the excellent Flexmark java-based markdown parser. At the
-most basic level, `cybermonday` provides a top level function `md-to-hiccup`
+most basic level, `cybermonday` provides a top level function `parse-md`
 that gives you a nice, reagent-renderable representation of your source. This
 includes all of the CommonMark spec as well as the best features of popular extensions such as tables,
 strikethroughs, footnotes, generic attributes, definitions, math, and more! This
