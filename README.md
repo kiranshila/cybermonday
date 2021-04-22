@@ -32,6 +32,9 @@ run into any issues.
 
 For more details, check out the docs!
 
+[![cljdoc badge](https://cljdoc.org/badge/com.kiranshila/cybermonday)](https://cljdoc.org/d/com.kiranshila/cybermonday/CURRENT)
+
+
 ## Major Caveats
 
 The inline html parser is really rudimentary. Please be gentle. They pretty much must follow the `<tag foo="bar"> Content </tag>` syntax to be properly rendered.
