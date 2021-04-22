@@ -1,7 +1,9 @@
 # cybermonday
+> A markdown (extended CommonMark) to Clojure data (hiccup) parser.
+
 [![Clojars Project](https://img.shields.io/clojars/v/com.github.kiranshila/cybermonday.svg)](https://clojars.org/com.github.kiranshila/cybermonday)
 [![cljdoc badge](https://cljdoc.org/badge/com.github.kiranshila/cybermonday)](https://cljdoc.org/d/com.github.kiranshila/cybermonday/CURRENT)
-A markdown (extended CommonMark) to Clojure data (hiccup) parser.
+
 
 I've been frustrated with the space of Markdown manipulation in Clojure. Most
 libraries provide parsing to raw html, which is fine if you have a
