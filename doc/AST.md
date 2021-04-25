@@ -24,28 +24,33 @@ map and body. Cybermonday will provide default processing, but the corresponding
 data layouts for each node are enumerated below to allow for custom processing
 into final html hiccup.
 
+Every IR node will have the form
+```clojure
+[:cybermonday.ir/keyword attr-map & body]
+```
+
 ### Bullet List Item
 
 ```clojure
-[:cybermonday.ir/bullet-list-item "Item"]
+[:cybermonday.ir/bullet-list-item {} "Item"]
 ```
 
 ### Ordered List Item
 
 ```clojure
-[:cybermonday.ir/ordered-list-item "Item"]
+[:cybermonday.ir/ordered-list-item {} "Item"]
 ```
 
 ### Hard Line Break
 
 ```clojure
-[:cybermonday.ir/hard-line-break]
+[:cybermonday.ir/hard-line-break {}]
 ```
 
 ### Soft Line Break
 
 ```clojure
-[:cybermonday.ir/soft-line-break]
+[:cybermonday.ir/soft-line-break {}]
 ```
 
 ### Heading
@@ -68,7 +73,7 @@ into final html hiccup.
 ### Indented Code Block
 
 ```clojure
-[:cybermonday.ir/indented-code-block "code"]
+[:cybermonday.ir/indented-code-block {} "code"]
 ```
 
 ### Table Separator
@@ -149,7 +154,7 @@ link.
 ### HTML Comments
 
 ```clojure
-[:cybermonday.ir/html-comment "<!--I'm a comment!-->"]
+[:cybermonday.ir/html-comment {} "<!--I'm a comment!-->"]
 ```
 
 ## Non Commonmark Extensions
@@ -161,7 +166,7 @@ might want to choose the rendering backend, unlike GitLab - the default
 translation to HTML will be as is as text.
 
 ```clojure
-[:cybermonday.ir/inline-math "y=mx+b"]
+[:cybermonday.ir/inline-math {} "y=mx+b"]
 ```
 
 ### Attributes
@@ -190,9 +195,9 @@ The definition list contains the term and item children nodes. The term and
 item bodies can of course contain additional hiccup.
 
 ```clojure
- [:cybermonday.ir/definition-list
-  [:cybermonday.ir/definition-term "Foo"]
-  [:cybermonday.ir/definition-item [:p "Bar"]]]
+ [:cybermonday.ir/definition-list {}
+  [:cybermonday.ir/definition-term {} "Foo"]
+  [:cybermonday.ir/definition-item {} [:p {} "Bar"]]]
 ```
 
 ### Footnotes

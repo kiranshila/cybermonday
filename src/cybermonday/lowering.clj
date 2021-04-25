@@ -5,19 +5,25 @@
    [cybermonday.ir :as ir]
    [clojure.string :as str]))
 
+(def default-tags
+  "Deafult mappings from IR tags to HTML tags where transformation isn't required"
+  {::ir/bullet-list-item :li
+   ::ir/ordered-list-item :li
+   ::ir/hard-line-break :br
+   ::ir/definition-list :dl
+   ::ir/definition-term :dd
+   ::ir/definition-item :dt
+   ::ir/inline-math :pre
+   ::ir/soft-line-break nil
+   ::ir/image :image
+   ::ir/attributes nil
+   ::ir/table-separator nil
+   ::ir/link :a
+   ::ir/autolink :a
+   ::ir/html-comment nil
+   ::ir/reference nil})
+
 (defmulti lower #(first %))
-
-(defmethod lower ::ir/bullet-list-item [node]
-  (assoc node 0 :li))
-
-(defmethod lower ::ir/ordered-list-item [node]
-  (assoc node 0 :li))
-
-(defmethod lower ::ir/hard-line-break [_]
-  [:br])
-
-(defmethod lower ::ir/soft-line-break [_]
-  nil)
 
 (defmethod lower ::ir/heading [[_ {:keys [level id]} body]]
   [(keyword (str "h" level))
@@ -31,11 +37,8 @@
 (defmethod lower ::ir/fenced-code-block [[_ attrs body]]
   [:pre [:code {:class (str "language-" (:language attrs))} body]])
 
-(defmethod lower ::ir/indented-code-block [_ body]
-  [:pre [:code body]])
-
-(defmethod lower ::ir/table-separator [_]
-  nil)
+(defmethod lower ::ir/indented-code-block [[_ attrs body]]
+  [:pre attrs [:code body]])
 
 (defmethod lower ::ir/table-cell [[_ attrs body]]
   [(if (:header? attrs) :th :td)
@@ -43,41 +46,11 @@
      {:align align})
    body])
 
-(defmethod lower ::ir/link [node]
-  (assoc node 0 :a))
-
-(defmethod lower ::ir/autolink [node]
-  (assoc node 0 :a))
-
 (defmethod lower ::ir/mail-link [[_ {:keys [address]}]]
   [:a {:href (str "mailto:" address)}])
 
-(defmethod lower ::ir/html-comment [_]
-  nil)
-
-(defmethod lower ::ir/reference [_]
-  nil)
-
 (defmethod lower ::ir/link-ref [[_ {:keys [reference]}]]
   (lower reference))
-
-(defmethod lower ::ir/image [node]
-  (assoc node 0 :image))
-
-(defmethod lower ::ir/attributes [_]
-  nil)
-
-(defmethod lower ::ir/definition-list [node]
-  (assoc node 0 :dl))
-
-(defmethod lower ::ir/definition-term [node]
-  (assoc node 0 :dd))
-
-(defmethod lower ::ir/definition-item [node]
-  (assoc node 0 :dt))
-
-(defmethod lower ::ir/inline-math [node]
-  (assoc node 0 :pre))
 
 ; FIXME pretty footnotes at bottom
 
@@ -91,12 +64,17 @@
     [:span content]
     [:a {:href (str "#fnref-" id)} "↩"]]])
 
-(defmethod lower :default [node]
-  node)
+(defmethod lower :default [[tag attrs body]]
+  (if (contains? default-tags tag)
+    (when-let [new-tag (default-tags tag)]
+      [new-tag attrs body])
+    [tag attrs body]))
 
 (defn merge-attributes
   "Merges in explicit attributes into the attributes of the parent node"
-  [ir])
+  [ir]
+  ; FIXME
+  )
 
 (defn to-html-hiccup
   "Transforms a cybermonday IR into standard HTML hiccup"

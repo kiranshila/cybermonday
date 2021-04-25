@@ -62,12 +62,16 @@
    BulletList :ul
    BulletListItem ::bullet-list-item
    OrderedListItem ::ordered-list-item
+   TableSeparator ::table-separator
    Code :code
    TableBlock :table
    TableHead :thead
    TableBody :tbody
    TableRow :tr
-   BlockQuote :blockquote})
+   BlockQuote :blockquote
+   DefinitionList ::definition-list
+   DefinitionTerm ::definition-term
+   DefinitionItem ::definition-item})
 
 (defn node-to-tag
   "Gets the default tag for this `node` or throws an error if we encounter a node we aren't handling."
@@ -86,6 +90,7 @@
   Node
   (to-hiccup [this]
     (make-hiccup-node (node-to-tag this)
+                      {}
                       (map-children-to-hiccup this)))
   Text
   (to-hiccup [this]
@@ -99,8 +104,8 @@
   ListItem
   (to-hiccup [this]
     (if (every? #(instance? Paragraph %) (.getChildren this))
-      [(node-to-tag this) (str/trim (str/join (map #(.getChars %) (.getChildren this))))]
-      (make-hiccup-node (node-to-tag this) (map-children-to-hiccup this))))
+      [(node-to-tag this) {} (str/trim (str/join (map #(.getChars %) (.getChildren this))))]
+      (make-hiccup-node (node-to-tag this) {} (map-children-to-hiccup this))))
   FencedCodeBlock
   (to-hiccup [this]
     (make-hiccup-node ::fenced-code-block
@@ -108,9 +113,7 @@
                       (map-children-to-hiccup this)))
   IndentedCodeBlock
   (to-hiccup [this]
-    [::indented-code-block (str (.getContentChars this))])
-  TableSeparator
-  (to-hiccup [this] [::table-separator])
+    [::indented-code-block {} (str (.getContentChars this))])
   TableCell
   (to-hiccup [this]
     (make-hiccup-node ::table-cell
@@ -152,10 +155,10 @@
     [::mail-link {:address (str (.getText this))}])
   HtmlCommentBlock
   (to-hiccup [this]
-    [::html-comment (str (.getChars this))])
+    [::html-comment {} (str (.getChars this))])
   GitLabInlineMath
   (to-hiccup [this]
-    [::inline-math (str (.getText this))])
+    [::inline-math {} (str (.getText this))])
   HtmlEntity
   (to-hiccup [this]
     (->> (.getChars this)
@@ -175,15 +178,6 @@
                                (.isId attribute) [:id value]
                                (.isClass attribute) [:class value]
                                :else [(keyword name) (if (not-empty value) value true)])))])
-  DefinitionList
-  (to-hiccup [this]
-    (make-hiccup-node ::definition-list (map-children-to-hiccup this)))
-  DefinitionTerm
-  (to-hiccup [this]
-    (make-hiccup-node ::definition-term (map-children-to-hiccup this)))
-  DefinitionItem
-  (to-hiccup [this]
-    (make-hiccup-node ::definition-item (map-children-to-hiccup this)))
   Footnote
   (to-hiccup [this]
     [::footnote {:id (str (.getText this))}])
