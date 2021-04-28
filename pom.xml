@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                                            
+                                                
+  
+  
   
   
   
@@ -22,7 +24,9 @@
   
   
   <modelVersion>4.0.0</modelVersion>
-                                            
+                                                
+  
+  
   
   
   
@@ -44,7 +48,9 @@
   
   
   <groupId>com.kiranshila</groupId>
-                                            
+                                                
+  
+  
   
   
   
@@ -66,7 +72,9 @@
   
   
   <artifactId>cybermonday</artifactId>
-                                            
+                                                
+  
+  
   
   
   
@@ -88,7 +96,9 @@
   
   
   <version>0.0.8</version>
-                                            
+                                                
+  
+  
   
   
   
@@ -110,7 +120,9 @@
   
   
   <name>cybermonday</name>
-                                            
+                                                
+  
+  
   
   
   
@@ -244,7 +256,9 @@
     </dependency>
       
   </dependencies>
-                                            
+                                                
+  
+  
   
   
   
@@ -266,7 +280,9 @@
   
   
   <build>
-                                                                                        
+                                                                                                
+    
+    
     
     
     
@@ -288,7 +304,9 @@
     
     
     <sourceDirectory>src</sourceDirectory>
-                                                                                      
+                                                                                              
+  
+  
   
   
   
@@ -310,7 +328,9 @@
   
   
   </build>
-                                            
+                                                
+  
+  
   
   
   
@@ -332,7 +352,9 @@
   
   
   <repositories/>
-                                          
+                                              
+  
+  
   
   
   
@@ -354,7 +376,9 @@
   
   
   <scm>
-                                                                                    
+                                                                                            
+    
+    
     
     
     
@@ -375,7 +399,7 @@
     
     
     <url>https://github.com/kiranshila/cybermonday</url>
-                                                                                    
+                                                                                            
     
     
     
@@ -395,8 +419,12 @@
     
     
     
-    <tag>47206a26e7d2a0adca5ce8048044596c58f7689a</tag>
-                                                                                    
+    
+    
+    <tag>183db6158d03785efe41cb606a8983b363735268</tag>
+                                                                                            
+    
+    
     
     
     
@@ -417,7 +445,9 @@
     
     
     <connection>scm:git:git@github.com:kiranshila/cybermonday.git</connection>
-                                                                                    
+                                                                                            
+    
+    
     
     
     
@@ -438,7 +468,9 @@
     
     
     <developerConnection>scm:git:git@github.com:kiranshila/cybermonday.git</developerConnection>
-                                                                                  
+                                                                                          
+  
+  
   
   
   
@@ -459,7 +491,9 @@
   
   
   </scm>
-                                        
+                                            
+
+
 
 
 
