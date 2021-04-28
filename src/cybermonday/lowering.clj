@@ -14,14 +14,14 @@
    ::ir/definition-term :dd
    ::ir/definition-item :dt
    ::ir/inline-math :pre
-   ::ir/soft-line-break nil
    ::ir/image :image
-   ::ir/attributes nil
-   ::ir/table-separator nil
    ::ir/link :a
    ::ir/autolink :a
    ::ir/html-comment nil
-   ::ir/reference nil})
+   ::ir/soft-line-break nil
+   ::ir/attributes nil
+   ::ir/reference nil
+   ::ir/table-separator nil})
 
 (defmulti lower #(first %))
 

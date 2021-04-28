@@ -90,7 +90,6 @@
   Node
   (to-hiccup [this]
     (make-hiccup-node (node-to-tag this)
-                      {}
                       (map-children-to-hiccup this)))
   Text
   (to-hiccup [this]
@@ -101,11 +100,6 @@
                       {:level (.getLevel this)
                        :id (not-empty (.getAnchorRefId this))}
                       (map-children-to-hiccup this)))
-  ListItem
-  (to-hiccup [this]
-    (if (every? #(instance? Paragraph %) (.getChildren this))
-      [(node-to-tag this) {} (str/trim (str/join (map #(.getChars %) (.getChildren this))))]
-      (make-hiccup-node (node-to-tag this) {} (map-children-to-hiccup this))))
   FencedCodeBlock
   (to-hiccup [this]
     (make-hiccup-node ::fenced-code-block
