@@ -237,7 +237,7 @@ delimiters enables math rendering
    [cybermonday.ir :as ir]
    [cybermonday.lowering :refer [lower]]))
 
-(defmethod lower ::ir/inline-math [[_ math]]
+(defmethod lower ::ir/inline-math [[_ attrs & [math]]]
   (str "$$" math "$$"))
 ```
 

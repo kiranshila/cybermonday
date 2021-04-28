@@ -9,5 +9,3 @@
   [md]
   (->> (md-to-ir md)
        to-html-hiccup))
-
-(def test-file (slurp "https://raw.githubusercontent.com/mxstbr/markdown-test-file/master/TEST.md"))

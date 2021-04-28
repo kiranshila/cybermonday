@@ -1,4 +1,6 @@
-(ns cybermonday.utils)
+(ns cybermonday.utils
+  (:require [clojure.walk :as walk]
+            [clojure.string :as str]))
 
 (defn make-hiccup-node
   "Creates a hiccup node, consuming a sequence of children"
@@ -13,3 +15,26 @@
   (and (vector? element)
        (keyword? (first element))
        (map? (second element))))
+
+(defn collect-text
+  "Given hiccup, return a sequence of just the text items"
+  [ir]
+  (->> (walk/postwalk
+        (fn [item]
+          (if (or
+               (vector? item)
+               (string? item))
+            item
+            nil))
+        ir)
+       flatten
+       (filter identity)))
+
+(defn gen-id
+  "Given an IR node, generate an id based on all its text"
+  [node]
+  (->> (collect-text node)
+       (map #(str/replace % #"[^0-9A-Za-z\s\-]" ""))
+       (map #(str/replace % #"\s+" "-"))
+       (apply str)
+       str/lower-case))

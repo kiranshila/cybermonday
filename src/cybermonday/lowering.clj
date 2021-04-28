@@ -1,9 +1,8 @@
 (ns cybermonday.lowering
   (:require
-   [cybermonday.utils :refer [hiccup? make-hiccup-node]]
+   [cybermonday.utils :refer [hiccup? make-hiccup-node gen-id]]
    [clojure.walk :as walk]
-   [cybermonday.ir :as ir]
-   [clojure.string :as str]))
+   [cybermonday.ir :as ir]))
 
 (def default-tags
   "Deafult mappings from IR tags to HTML tags where transformation isn't required"
@@ -25,23 +24,21 @@
 
 (defmulti lower #(first %))
 
-(defmethod lower ::ir/heading [[_ {:keys [level id] :as attrs} & body]]
+(defmethod lower ::ir/heading [[_ attrs & body :as node]]
   (make-hiccup-node
-   (keyword (str "h" level))
+   (keyword (str "h" (:level attrs)))
    (dissoc
     (assoc attrs
-           :id (if (nil? id)
-                 (-> body
-                     str/lower-case
-                     (str/replace #"\s+" "-"))
-                 id))
+           :id (if (nil? (:id attrs))
+                 (gen-id node)
+                 (:id attrs)))
     :level)
    body))
 
 (defmethod lower ::ir/fenced-code-block [[_ attrs & body]]
   [:pre {}
    (make-hiccup-node
-    :code (dissoc (merge {:class (str "language-" (:language attrs))} attrs) :language) body)])
+    :code (dissoc (assoc attrs :class (str "language-" (:language attrs))) :language) body)])
 
 (defmethod lower ::ir/indented-code-block [[_ attrs & body]]
   [:pre attrs
@@ -52,11 +49,11 @@
   (make-hiccup-node
    (if (:header? attrs) :th :td)
    (when-let [align (:alignment attrs)]
-     (dissoc (merge {:align align} attrs) :alignment))
+     (dissoc (assoc attrs :align align) :alignment))
    body))
 
 (defmethod lower ::ir/mail-link [[_ {:keys [address] :as attrs}]]
-  [:a (dissoc (merge {:href (str "mailto:" address)} attrs) :address)])
+  [:a (dissoc (assoc attrs :href (str "mailto:" address)) :address)])
 
 (defmethod lower ::ir/link-ref [[_ {:keys [reference]}]]
   (lower reference))
@@ -82,7 +79,7 @@
 (defn attributes
   "Returns the attributes map of a given node, merging children attributes IR nodes"
   [[_ attrs & body]]
-  (apply merge attrs (map second (filterv #(= ::ir/attributes (first %)) body))))
+  (apply merge attrs (map second (filter #(= ::ir/attributes (first %)) body))))
 
 (defn merge-attributes
   "Walks the IR tree and merges in attributes"
