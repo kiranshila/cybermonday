@@ -11,4 +11,5 @@
   "Tests to see if an element is valid hiccup"
   [element]
   (and (vector? element)
-       (keyword? (first element))))
+       (keyword? (first element))
+       (map? (second element))))
