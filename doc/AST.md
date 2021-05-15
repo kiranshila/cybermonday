@@ -25,6 +25,7 @@ data layouts for each node are enumerated below to allow for custom processing
 into final html hiccup.
 
 Every IR node will have the form
+
 ```clojure
 [:cybermonday.ir/keyword attr-map & body]
 ```
@@ -270,17 +271,19 @@ by customizing the `::ir/header` lowering.
   (:require
    [clojure.string :as str]
    [cybermonday.ir :as ir]
+   [cybermonday.utils :refer [gen-id make-hiccup-node]]
    [cybermonday.lowering :refer [lower]]))
 
-(defmethod lower ::ir/heading [[_ {:keys [level id]} body]]
-  (let [id (if (nil? id)
-             (-> body
-                 str/lower-case
-                 (str/replace #"\s+" "-"))
-             id)]
-    [(keyword (str "h" level))
-     [:a {:id (str "heading-id-" id)
-          :class "anchor"
-          :href (str "#" id)}
-      body]]))
+(defmethod lower ::ir/heading [[_ attrs & body :as node]]
+  (make-hiccup-node
+   (keyword (str "h" (:level attrs)))
+   (dissoc
+    (assoc attrs
+           :id (if (nil? (:id attrs))
+                 (gen-id node)
+                 (:id attrs))
+           :class "anchor"
+           :href (str "#" id))
+    :level)
+   body))
 ```
