@@ -48,8 +48,9 @@
 (defmethod lower ::parser/table-cell [[_ attrs & body]]
   (make-hiccup-node
    (if (:header? attrs) :th :td)
-   (when-let [align (:alignment attrs)]
-     (dissoc (assoc attrs :align align) :alignment))
+   (if-let [align (:alignment attrs)]
+     (dissoc (assoc attrs :align align) :alignment)
+     {})
    body))
 
 (defmethod lower ::parser/mail-link [[_ {:keys [address] :as attrs}]]
