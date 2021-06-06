@@ -102,7 +102,7 @@ Please note that some of these are Flexmark specific and not available in remark
 `:title` (potentially `nil`) contains the optional link title
 
 ```clojure
-[:cybermonday.parser/link {:href "https://example.com" :title "A neat website"} "Click me"]
+[:a {:href "https://example.com" :title "A neat website"} "Click me"]
 ```
 
 ### Reference
@@ -137,7 +137,7 @@ link.
 `:title` (potentially `nil`) contains the optional link title
 
 ```clojure
-[:cybermonday.parser/image {:src "cat.png" :alt "Witty alt-text" :title "More info"}]
+[:img {:src "cat.png" :alt "Witty alt-text" :title "More info"}]
 ```
 
 ### Auto Link
@@ -200,9 +200,9 @@ The definition list contains the term and item children nodes. The term and
 item bodies can of course contain additional hiccup.
 
 ```clojure
- [:cybermonday.parser/definition-list {}
-  [:cybermonday.parser/definition-term {} "Foo"]
-  [:cybermonday.parser/definition-item {} [:p {} "Bar"]]]
+ [:dl {}
+  [:dt {} "Foo"]
+  [:dd {} [:p {} "Bar"]]]
 ```
 
 ### Footnotes
@@ -239,10 +239,9 @@ delimiters enables math rendering
 ```clojure
 (ns my-library
   (:require
-   [cybermonday.parser :as parser]
    [cybermonday.lowering :refer [lower]]))
 
-(defmethod lower ::parser/inline-math [[_ attrs & [math]]]
+(defmethod lower :markdown/inline-math [[_ attrs & [math]]]
   (str "$$" math "$$"))
 ```
 
@@ -256,10 +255,9 @@ part of the parse tree, we can capture this specific result.
 (ns my-library
   (:require
    [clojure.string :as str]
-   [cybermonday.parser :as parser]
    [cybermonday.lowering :refer [lower]]))
 
-(defmethod lower ::parser/html-comment [[_ body]]
+(defmethod lower :markdown/html-comment [[_ body]]
   (when (str/includes? body "more")
     [:div {:class "content-split"}]))
 ```
@@ -268,17 +266,16 @@ part of the parse tree, we can capture this specific result.
 
 A common feature in many markdown renderers is to place an anchor link on each
 heading. Cybermonday generates ids for each header, so anchor links can be made
-by customizing the `::parser/heading` lowering.
+by customizing the `:markdown/heading` lowering.
 
 ```clojure
 (ns my-library
   (:require
    [clojure.string :as str]
-   [cybermonday.parser :as parser]
    [cybermonday.utils :refer [gen-id make-hiccup-node]]
    [cybermonday.lowering :refer [lower]]))
 
-(defmethod lower ::parser/heading [[_ attrs & body :as node]]
+(defmethod lower :markdown/heading [[_ attrs & body :as node]]
   (make-hiccup-node
    (keyword (str "h" (:level attrs)))
    (dissoc

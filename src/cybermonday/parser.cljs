@@ -7,7 +7,6 @@
    ["remark-parse" :as rp]
    ["remark-footnotes" :as footnotes]
    ["html-entities" :as entities]
-   #_["mdast-util-definitions" :as definitions]
    ["remark-gfm" :as gfm]))
 
 (def parser (.. (unified)
@@ -26,7 +25,7 @@
    "blockquote" :blockquote
    "listItem" :li
    "delete" :del
-   "inlineMath" ::inline-math})
+   "inlineMath" :markdown/inline-math})
 
 (defn node-to-tag
   [node]
@@ -42,7 +41,7 @@
   (entities/decode (.-value this)))
 
 (defmethod to-hiccup "heading" [this]
-  (make-hiccup-node ::heading
+  (make-hiccup-node :markdown/heading
                     {:level (.-depth this)}
                     (map-children-to-hiccup this)))
 
@@ -60,7 +59,7 @@
   [:code {} (.-value this)])
 
 (defmethod to-hiccup "link" [this]
-  (make-hiccup-node ::link
+  (make-hiccup-node :a
                     {:href (.-url this)
                      :title (.-title this)}
                     (map-children-to-hiccup this)))
@@ -73,40 +72,40 @@
        (make-hiccup-node
         :tr
         (for [[j cell] (map-indexed vector (.-children row))]
-          (make-hiccup-node ::table-cell
+          (make-hiccup-node :markdown/table-cell
                             {:header? (= i 0)
                              :alignment (get alignment j)}
                             (map-children-to-hiccup cell))))))))
 
 (defmethod to-hiccup "linkReference" [this]
-  (make-hiccup-node ::link-ref
+  (make-hiccup-node :markdown/link-ref
                     {:reference nil}
                     (map-children-to-hiccup this)))
 
 (defmethod to-hiccup "definition" [this]
-  [::reference {:title (.-title this)
-                :label (.-label this)
-                :href (.-url this)}])
+  [:markdown/reference {:title (.-title this)
+                        :label (.-label this)
+                        :href (.-url this)}])
 
 (defmethod to-hiccup "image" [this]
-  [::image {:src (.-url this)
-            :alt (.-alt this)
-            :title (.-title this)}])
+  [:img {:src (.-url this)
+         :alt (.-alt this)
+         :title (.-title this)}])
 
 (defmethod to-hiccup "html" [this]
   ;FIXME this needs work
   (let [body (.-value this)]
     (if-let [[_ comment] (re-matches html-comment-re body)]
-      [::html-comment {} comment]
-      [::html {} body])))
+      [:markdown/html-comment {} comment]
+      [:markdown/html {} body])))
 
 (defmethod to-hiccup "footnoteReference" [this]
-  [::footnote {:id (.-identifier this)}])
+  [:markdown/footnote {:id (.-identifier this)}])
 
 (defmethod to-hiccup "footnoteDefinition" [this]
   ;FIXME to match behavior of flexmark
-  [::footnote-block {:id (.-identifier this)
-                     :content (make-hiccup-node :div (map-children-to-hiccup this))}])
+  [:markdown/footnote-block {:id (.-identifier this)
+                             :content (make-hiccup-node :div (map-children-to-hiccup this))}])
 
 (defmethod to-hiccup :default [this]
   (make-hiccup-node (node-to-tag this)

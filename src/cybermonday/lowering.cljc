@@ -1,30 +1,24 @@
 (ns cybermonday.lowering
   (:require
    [cybermonday.utils :refer [hiccup? make-hiccup-node gen-id]]
-   [clojure.walk :as walk]
-   [cybermonday.parser :as parser]))
+   [clojure.walk :as walk]))
 
 (def default-tags
   "Deafult mappings from IR tags to HTML tags where transformation isn't required"
-  {::parser/bullet-list-item :li
-   ::parser/ordered-list-item :li
-   ::parser/hard-line-break :br
-   ::parser/definition-list :dl
-   ::parser/definition-term :dd
-   ::parser/definition-item :dt
-   ::parser/inline-math :pre
-   ::parser/image :image
-   ::parser/link :a
-   ::parser/autolink :a
-   ::parser/html-comment nil
-   ::parser/soft-line-break nil
-   ::parser/attributes nil
-   ::parser/reference nil
-   ::parser/table-separator nil})
+  {:markdown/bullet-list-item :li
+   :markdown/ordered-list-item :li
+   :markdown/hard-line-break :br
+   :markdown/inline-math :pre
+   :markdown/autolink :a
+   :markdown/html-comment nil
+   :markdown/soft-line-break nil
+   :markdown/attributes nil
+   :markdown/reference nil
+   :markdown/table-separator nil})
 
 (defmulti lower #(first %))
 
-(defmethod lower ::parser/heading [[_ attrs & body :as node]]
+(defmethod lower :markdown/heading [[_ attrs & body :as node]]
   (make-hiccup-node
    (keyword (str "h" (:level attrs)))
    (dissoc
@@ -35,17 +29,17 @@
     :level)
    body))
 
-(defmethod lower ::parser/fenced-code-block [[_ attrs & body]]
+(defmethod lower :markdown/fenced-code-block [[_ attrs & body]]
   [:pre {}
    (make-hiccup-node
     :code (dissoc (assoc attrs :class (str "language-" (:language attrs))) :language) body)])
 
-(defmethod lower ::parser/indented-code-block [[_ attrs & body]]
+(defmethod lower :markdown/indented-code-block [[_ attrs & body]]
   [:pre attrs
    (make-hiccup-node
     :code body)])
 
-(defmethod lower ::parser/table-cell [[_ attrs & body]]
+(defmethod lower :markdown/table-cell [[_ attrs & body]]
   (make-hiccup-node
    (if (:header? attrs) :th :td)
    (if-let [align (:alignment attrs)]
@@ -53,19 +47,19 @@
      {})
    body))
 
-(defmethod lower ::parser/mail-link [[_ {:keys [address] :as attrs}]]
+(defmethod lower :markdown/mail-link [[_ {:keys [address] :as attrs}]]
   [:a (dissoc (assoc attrs :href (str "mailto:" address)) :address)])
 
-(defmethod lower ::parser/link-ref [[_ {:keys [reference]}]]
+(defmethod lower :markdown/link-ref [[_ {:keys [reference]}]]
   (lower reference))
 
 ; FIXME pretty footnotes at bottom
 
-(defmethod lower ::parser/footnote [[_ {:keys [id]}]]
+(defmethod lower :markdown/footnote [[_ {:keys [id]}]]
   [:sup {:id (str "fnref-" id)}
    [:a {:href (str "#fn-" id)}]])
 
-(defmethod lower ::parser/footnote-block [[_ {:keys [id content]}]]
+(defmethod lower :markdown/footnote-block [[_ {:keys [id content]}]]
   [:li {:id (str "fn-" id)}
    [:p
     [:span content]
@@ -80,7 +74,7 @@
 (defn attributes
   "Returns the attributes map of a given node, merging children attributes IR nodes"
   [[_ attrs & body]]
-  (apply merge attrs (map second (filter #(= ::parser/attributes (first %)) body))))
+  (apply merge attrs (map second (filter #(= :markdown/attributes (first %)) body))))
 
 (defn merge-attributes
   "Walks the IR tree and merges in attributes"
