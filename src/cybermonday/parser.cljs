@@ -25,7 +25,8 @@
    "strong" :strong
    "blockquote" :blockquote
    "listItem" :li
-   "delete" :del})
+   "delete" :del
+   "inlineMath" ::inline-math})
 
 (defn node-to-tag
   [node]
@@ -50,12 +51,13 @@
                     (map-children-to-hiccup this)))
 
 (defmethod to-hiccup "code" [this]
-  [:code
-   {:language (.-lang this)}
-   (.-value this)])
+  [:span
+   [:code
+    {:language (.-lang this)}
+    (.-value this)]])
 
-(defmethod to-hiccup "inlineMath" [this]
-  [::inline-math {} (.-value this)])
+(defmethod to-hiccup "inlineCode" [this]
+  [:code {} (.-value this)])
 
 (defmethod to-hiccup "link" [this]
   (make-hiccup-node ::link
@@ -85,6 +87,11 @@
   [::reference {:title (.-title this)
                 :label (.-label this)
                 :href (.-url this)}])
+
+(defmethod to-hiccup "image" [this]
+  [::image {:src (.-url this)
+            :alt (.-alt this)
+            :title (.-title this)}])
 
 (defmethod to-hiccup "html" [this]
   ;FIXME this needs work
