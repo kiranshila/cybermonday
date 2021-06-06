@@ -65,13 +65,16 @@
 
 (defmethod to-hiccup "table" [this]
   (let [alignment (.-align this)]
-    [:table {}
+    (make-hiccup-node
+     :table
      (for [[i row] (map-indexed vector (.-children this))]
-       [:tr (for [[j cell] (map-indexed vector (.-children row))]
-              (make-hiccup-node ::table-cell
-                                {:header? (= i 0)
-                                 :alignment (get alignment j)}
-                                (map-children-to-hiccup cell)))])]))
+       (make-hiccup-node
+        :tr
+        (for [[j cell] (map-indexed vector (.-children row))]
+          (make-hiccup-node ::table-cell
+                            {:header? (= i 0)
+                             :alignment (get alignment j)}
+                            (map-children-to-hiccup cell))))))))
 
 (defmethod to-hiccup "linkReference" [this]
   (make-hiccup-node ::link-ref
