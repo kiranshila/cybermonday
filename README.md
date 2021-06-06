@@ -1,9 +1,9 @@
 # cybermonday
-> A markdown (extended CommonMark) to Clojure data (hiccup) parser.
+
+> What if markdown was _just data_
 
 [![Clojars Project](https://img.shields.io/clojars/v/com.kiranshila/cybermonday.svg)](https://clojars.org/com.kiranshila/cybermonday)
 [![cljdoc badge](https://cljdoc.org/badge/com.kiranshila/cybermonday)](https://cljdoc.org/d/com.kiranshila/cybermonday/CURRENT)
-
 
 I've been frustrated with the space of Markdown manipulation in Clojure. Most
 libraries provide parsing to raw html, which is fine if you have a
@@ -18,7 +18,7 @@ pipeline.
 
 To overcome this, I wrote `cybermonday`! It was originally going to be a parser
 for blackfriday markdown, but as I realized the markdown spec is insane, it made
-more sense to wrap the excellent Flexmark java-based markdown parser. At the
+more sense to wrap the excellent Flexmark (java) and Remark (js) markdown parsers. At the
 most basic level, `cybermonday` provides a top level function `parse-md`
 that gives you a nice, reagent-renderable representation of your source. This
 includes all of the CommonMark spec as well as the best features of popular extensions such as tables,
@@ -26,8 +26,8 @@ strikethroughs, footnotes, generic attributes, definitions, math, and more! This
 even supports inline html and html around markdown-formated text.
 
 However, `cybermonday` also provides access to a hiccup representation of the
-Flexmark AST and the multimethod to provide the final pass transformation from
-Flexmark to HTML. This allows the user to customize how the raw markdown AST
+Flexmark (and remark) AST and the multimethod to provide the final pass transformation from
+this intermediate representation to HTML. This allows the user to customize how the raw markdown AST
 gets transformed into html, allowing for easy extension and customization.
 
 I'm using this library on my blog at kiranshila.com - please let me know if you

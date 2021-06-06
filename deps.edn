@@ -9,7 +9,8 @@
         com.vladsch.flexmark/flexmark-ext-attributes {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-test-util {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-ext-gitlab {:mvn/version "0.62.2"}
-        hickory/hickory {:mvn/version "0.7.1"}}
+        hickory/hickory {:mvn/version "0.7.1"}
+        thheller/shadow-cljs {:mvn/version "2.14.3"}}
 
  :aliases
  {:jar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.216"}}
