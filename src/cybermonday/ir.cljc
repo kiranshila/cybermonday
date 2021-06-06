@@ -99,3 +99,7 @@
     (->> (parser/to-hiccup document)
          process-inline-html
          cleanup-whitespace)))
+
+(def test-str "Here is a footnote reference,[^1]
+
+[^1]: Here is the footnote.")

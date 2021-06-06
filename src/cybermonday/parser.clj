@@ -1,6 +1,6 @@
 (ns cybermonday.parser
   (:require
-   [cybermonday.utils :refer [make-hiccup-node]]
+   [cybermonday.utils :refer [make-hiccup-node html-comment-re]]
    [hickory.core :as h]
    [clojure.string :as str])
   (:import
@@ -148,7 +148,8 @@
     [::mail-link {:address (str (.getText this))}])
   HtmlCommentBlock
   (to-hiccup [this]
-    [::html-comment {} (str (.getChars this))])
+    (let [[_ comment] (re-matches html-comment-re (str (.getChars this)))]
+      [::html-comment {} comment]))
   GitLabInlineMath
   (to-hiccup [this]
     [::inline-math {} (str (.getText this))])

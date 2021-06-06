@@ -1,16 +1,18 @@
 (ns cybermonday.parser
   (:require
-   [cybermonday.utils :refer [make-hiccup-node]]
+   [cybermonday.utils :refer [make-hiccup-node html-comment-re]]
    ["remark" :as remark]
    ["unified" :as unified]
    ["remark-math" :as math]
    ["remark-parse" :as rp]
-   ["remark-gfm" :as gfm]
-   ["remark-deflist" :as deflist]))
+   ["remark-footnotes" :as footnotes]
+   ["html-entities" :as entities]
+   #_["mdast-util-definitions" :as definitions]
+   ["remark-gfm" :as gfm]))
 
 (def parser (.. (unified)
                 (use rp)
-                (use deflist)
+                (use footnotes)
                 (use math)
                 (use gfm)))
 
@@ -36,7 +38,7 @@
   (map #(to-hiccup %) (.-children this)))
 
 (defmethod to-hiccup "text" [this]
-  (.-value this))
+  (entities/decode (.-value this)))
 
 (defmethod to-hiccup "heading" [this]
   (make-hiccup-node ::heading
@@ -70,6 +72,31 @@
                                 {:header? (= i 0)
                                  :alignment (get alignment j)}
                                 (map-children-to-hiccup cell)))])]))
+
+(defmethod to-hiccup "linkReference" [this]
+  (make-hiccup-node ::link-ref
+                    {:reference nil}
+                    (map-children-to-hiccup this)))
+
+(defmethod to-hiccup "definition" [this]
+  [::reference {:title (.-title this)
+                :label (.-label this)
+                :href (.-url this)}])
+
+(defmethod to-hiccup "html" [this]
+  ;FIXME this needs work
+  (let [body (.-value this)]
+    (if-let [[_ comment] (re-matches html-comment-re body)]
+      [::html-comment {} comment]
+      [::html {} body])))
+
+(defmethod to-hiccup "footnoteReference" [this]
+  [::footnote {:id (.-identifier this)}])
+
+(defmethod to-hiccup "footnoteDefinition" [this]
+  ;FIXME to match behavior of flexmark
+  [::footnote-block {:id (.-identifier this)
+                     :content (make-hiccup-node :div (map-children-to-hiccup this))}])
 
 (defmethod to-hiccup :default [this]
   (make-hiccup-node (node-to-tag this)

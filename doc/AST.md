@@ -159,7 +159,7 @@ link.
 ### HTML Comments
 
 ```clojure
-[:cybermonday.parser/html-comment {} "<!--I'm a comment!-->"]
+[:cybermonday.parser/html-comment {} "I'm a comment!"]
 ```
 
 ## Non Commonmark Extensions
@@ -260,7 +260,7 @@ part of the parse tree, we can capture this specific result.
    [cybermonday.lowering :refer [lower]]))
 
 (defmethod lower ::parser/html-comment [[_ body]]
-  (when (str/includes? body "<!--more-->")
+  (when (str/includes? body "more")
     [:div {:class "content-split"}]))
 ```
 

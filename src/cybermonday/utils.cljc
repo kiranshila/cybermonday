@@ -38,3 +38,5 @@
        (map #(str/replace % #"\s+" "-"))
        (apply str)
        str/lower-case))
+
+(def html-comment-re #"<!--([\s\S]*?)-->")
