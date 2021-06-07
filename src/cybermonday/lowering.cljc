@@ -14,7 +14,6 @@
    :markdown/soft-line-break nil
    :markdown/attributes nil
    :markdown/reference nil
-   :markdown/link-reference nil
    :markdown/table-separator nil})
 
 (defn lower-heading [[_ attrs & body :as node]]
@@ -61,6 +60,12 @@
     [:span content]
     [:a {:href (str "#fnref-" id)} "↩"]]])
 
+(defn lower-link-ref [[_ {:keys [reference]} body]]
+  (when reference
+    [:a (dissoc (second reference) :label) body]
+    ; In the other case, we probably want to just return the text (Flexmark)
+    ))
+
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
     (when-let [new-tag (default-tags tag)]
@@ -76,17 +81,7 @@
    :markdown/mail-link lower-mail-link
    :markdown/footnote lower-footnote
    :markdown/footnote-block lower-footnote-block
-   :markdown/bullet-list-item lower-fallback
-   :markdown/ordered-list-item lower-fallback
-   :markdown/hard-line-break lower-fallback
-   :markdown/inline-math lower-fallback
-   :markdown/autolink lower-fallback
-   :markdown/html-comment lower-fallback
-   :markdown/soft-line-break lower-fallback
-   :markdown/attributes lower-fallback
-   :markdown/reference lower-fallback
-   :markdown/link-reference lower-fallback
-   :markdown/table-separator lower-fallback})
+   :markdown/link-ref lower-link-ref})
 
 (defn attributes
   "Returns the attributes map of a given node, merging children attributes IR nodes"
@@ -107,12 +102,15 @@
   "Transforms the IR tree by lowering nodes to their HTML representation"
   ([ir lowering-map]
    (let [final-map (conj default-lowering lowering-map)]
-     (walk/postwalk
+     (walk/prewalk
       (fn [item]
         (if (hiccup? item)
-          (if-let [transform-fn ((first item) final-map)]
-            (transform-fn item)
-            item)
+          (let [tag (first item)]
+            (if-let [transform-fn (tag final-map)]
+              (transform-fn item)
+              (if (contains? default-tags tag)
+                (lower-fallback item)
+                item)))
           item))
       ir)))
   ([ir] (lower-ir ir default-lowering)))
