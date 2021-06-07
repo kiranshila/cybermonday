@@ -32,39 +32,40 @@
   (or (node-tags (.-type node))
       (throw (js/Error. (str "Got unknown AST node: " (.-type node))))))
 
-(defmulti to-hiccup #(.-type %))
+(defmulti transform (fn [node _] (.-type node)))
 
-(defn map-children-to-hiccup [this]
-  (map #(to-hiccup %) (.-children this)))
+(defn transform-children [this defs]
+  (map #(transform % defs) (.-children this)))
 
-(defmethod to-hiccup "text" [this]
+(defmethod transform "text" [this _]
   (entities/decode (.-value this)))
 
-(defmethod to-hiccup "heading" [this]
+(defmethod transform "heading" [this defs]
   (make-hiccup-node :markdown/heading
                     {:level (.-depth this)}
-                    (map-children-to-hiccup this)))
+                    (transform-children this defs)))
 
-(defmethod to-hiccup "list" [this]
+(defmethod transform "list" [this defs]
   (make-hiccup-node (if (.-ordered this) :ol :ul)
-                    (map-children-to-hiccup this)))
+                    (transform-children this defs)))
 
-(defmethod to-hiccup "code" [this]
+(defmethod transform "code" [this _]
+  ;FIXME needs to disambiguate between sources
   [:span
    [:code
     {:language (.-lang this)}
     (.-value this)]])
 
-(defmethod to-hiccup "inlineCode" [this]
+(defmethod transform "inlineCode" [this _]
   [:code {} (.-value this)])
 
-(defmethod to-hiccup "link" [this]
+(defmethod transform "link" [this defs]
   (make-hiccup-node :a
                     {:href (.-url this)
                      :title (.-title this)}
-                    (map-children-to-hiccup this)))
+                    (transform-children this defs)))
 
-(defmethod to-hiccup "table" [this]
+(defmethod transform "table" [this defs]
   (let [alignment (.-align this)]
     (make-hiccup-node
      :table
@@ -75,38 +76,47 @@
           (make-hiccup-node :markdown/table-cell
                             {:header? (= i 0)
                              :alignment (get alignment j)}
-                            (map-children-to-hiccup cell))))))))
+                            (transform-children cell defs))))))))
 
-(defmethod to-hiccup "linkReference" [this]
+(defmethod transform "linkReference" [this defs]
   (make-hiccup-node :markdown/link-ref
-                    {:reference nil}
-                    (map-children-to-hiccup this)))
+                    {:reference (defs (.-identifier this))}
+                    (transform-children this defs)))
 
-(defmethod to-hiccup "definition" [this]
+(defmethod transform "definition" [this _]
   [:markdown/reference {:title (.-title this)
-                        :label (.-label this)
+                        :label (.-identifier this)
                         :href (.-url this)}])
 
-(defmethod to-hiccup "image" [this]
+(defmethod transform "image" [this _]
   [:img {:src (.-url this)
          :alt (.-alt this)
          :title (.-title this)}])
 
-(defmethod to-hiccup "html" [this]
-  ;FIXME this needs work
+(defmethod transform "html" [this _]
   (let [body (.-value this)]
     (if-let [[_ comment] (re-matches html-comment-re body)]
       [:markdown/html-comment {} comment]
       [:markdown/html {} body])))
 
-(defmethod to-hiccup "footnoteReference" [this]
+(defmethod transform "footnoteReference" [this _]
   [:markdown/footnote {:id (.-identifier this)}])
 
-(defmethod to-hiccup "footnoteDefinition" [this]
+(defmethod transform "footnoteDefinition" [this defs]
   ;FIXME to match behavior of flexmark
   [:markdown/footnote-block {:id (.-identifier this)
-                             :content (make-hiccup-node :div (map-children-to-hiccup this))}])
+                             :content (make-hiccup-node :div (transform-children this defs))}])
 
-(defmethod to-hiccup :default [this]
+(defmethod transform :default [this defs]
   (make-hiccup-node (node-to-tag this)
-                    (map-children-to-hiccup this)))
+                    (transform-children this defs)))
+
+(defn collect-definitions [node]
+  (if (= "definition" (.-type node))
+    (let [def (transform node)]
+      {(:label (second def)) def})
+    (into {} (for [child (.-children node)]
+               (collect-definitions child)))))
+
+(defn to-hiccup [ast]
+  (transform ast (collect-definitions ast)))
