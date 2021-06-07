@@ -25,6 +25,7 @@
    "blockquote" :blockquote
    "listItem" :li
    "delete" :del
+   "break" :br
    "inlineMath" :markdown/inline-math})
 
 (defn node-to-tag
@@ -51,10 +52,9 @@
 
 (defmethod transform "code" [this _]
   ;FIXME needs to disambiguate between sources
-  [:span
-   [:code
-    {:language (.-lang this)}
-    (.-value this)]])
+  [:markdown/fenced-code-block
+   {:language (.-lang this)}
+   (.-value this)])
 
 (defmethod transform "inlineCode" [this _]
   [:code {} (.-value this)])

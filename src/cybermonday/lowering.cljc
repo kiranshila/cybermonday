@@ -62,9 +62,13 @@
 
 (defn lower-link-ref [[_ {:keys [reference]} body]]
   (when reference
-    [:a (dissoc (second reference) :label) body]
-    ; In the other case, we probably want to just return the text (Flexmark)
-    ))
+    [:a {:href (:url (second reference))
+         :title (:title (second reference))} body]))
+
+(defn lower-image-ref [[_ {:keys [reference]} body]]
+  (when reference
+    [:img {:src (:url (second reference))
+           :title (:title (second reference))} body]))
 
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
@@ -81,7 +85,8 @@
    :markdown/mail-link lower-mail-link
    :markdown/footnote lower-footnote
    :markdown/footnote-block lower-footnote-block
-   :markdown/link-ref lower-link-ref})
+   :markdown/link-ref lower-link-ref
+   :markdown/image-ref lower-image-ref})
 
 (defn attributes
   "Returns the attributes map of a given node, merging children attributes IR nodes"

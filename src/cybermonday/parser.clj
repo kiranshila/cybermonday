@@ -11,7 +11,7 @@
     BlockQuote FencedCodeBlock Heading HtmlBlockBase IndentedCodeBlock
     BulletList OrderedList BulletListItem OrderedListItem Paragraph ThematicBreak
     Code Emphasis StrongEmphasis HardLineBreak HtmlEntity Text
-    SoftLineBreak BlockQuote Link LinkRef Reference AutoLink MailLink Image HtmlInline
+    SoftLineBreak BlockQuote Link LinkRef ImageRef Reference AutoLink MailLink Image HtmlInline
     HtmlCommentBlock HtmlEntity)
    (com.vladsch.flexmark.ext.tables
     TablesExtension TableBlock TableHead TableRow TableCell TableBody TableBody TableSeparator)
@@ -126,10 +126,19 @@
   (to-hiccup [this]
     [:markdown/reference {:title (not-empty (str (.getTitle this)))
                           :label (str (.getReference this))
-                          :href (str (.getUrl this))}])
+                          :url (str (.getUrl this))}])
   LinkRef
   (to-hiccup [this]
     (make-hiccup-node :markdown/link-ref
+                      {:reference (-> (.getDocument this)
+                                      (.get Parser/REFERENCES)
+                                      (get (str (.getReference this)))
+                                      to-hiccup)}
+                      (map-children-to-hiccup this)))
+
+  ImageRef
+  (to-hiccup [this]
+    (make-hiccup-node :markdown/image-ref
                       {:reference (-> (.getDocument this)
                                       (.get Parser/REFERENCES)
                                       (get (str (.getReference this)))
