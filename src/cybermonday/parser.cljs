@@ -25,8 +25,7 @@
    "blockquote" :blockquote
    "listItem" :li
    "delete" :del
-   "break" :br
-   "inlineMath" :markdown/inline-math})
+   "break" :br})
 
 (defn node-to-tag
   [node]
@@ -40,6 +39,11 @@
 
 (defmethod transform "text" [this _]
   (entities/decode (.-value this)))
+
+(defmethod transform "inlineMath" [this _]
+  (if-let [match (re-matches #"`(.*)`" (.-value this))]
+    [:markdown/inline-math {} (second match)]
+    (str "$" (.-value this) "$"))) ; return the string verbatim if we don't match flexmark
 
 (defmethod transform "heading" [this defs]
   (make-hiccup-node :markdown/heading
@@ -55,6 +59,9 @@
   [:markdown/fenced-code-block
    {:language (.-lang this)}
    (.-value this)])
+
+(defmethod transform "math" [this _]
+  (str "$$\n" (.-value this) "\n$$")) ; return in place, don't use this block math format to match flexmark
 
 (defmethod transform "inlineCode" [this _]
   [:code {} (.-value this)])
