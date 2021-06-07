@@ -83,10 +83,15 @@
                     {:reference (defs (.-identifier this))}
                     (transform-children this defs)))
 
+(defmethod transform "imageReference" [this defs]
+  (make-hiccup-node :markdown/image-ref
+                    {:reference (defs (.-identifier this))}
+                    (transform-children this defs)))
+
 (defmethod transform "definition" [this _]
   [:markdown/reference {:title (.-title this)
                         :label (.-identifier this)
-                        :href (.-url this)}])
+                        :url (.-url this)}])
 
 (defmethod transform "image" [this _]
   [:img {:src (.-url this)

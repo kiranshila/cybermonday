@@ -19,11 +19,3 @@
                 md-to-ir
                 (to-html-hiccup lowering-map))}))
   ([md] (parse-md md default-lowering)))
-
-(def test-str "![][image_ref_a32ff4ads]
-
-text
-
-[image_ref_a32ff4ads]: data:image/png;base64,iVBORw0KGgoAAAANSUhEke02C1MyA29UWKgPA...RS12D==")
-
-(parse-md test-str)

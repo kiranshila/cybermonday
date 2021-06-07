@@ -109,10 +109,10 @@ Please note that some of these are Flexmark specific and not available in remark
 
 `:title` (potentially `nil`) contains the optional link title
 `:label` contains the reference label
-`:href` contains the reference url
+`:url` contains the reference url
 
 ```clojure
-[:markdown/reference {:title "Title", :label "1", :href "/url"}]
+[:markdown/reference {:title "Title", :label "1", :url "/url"}]
 ```
 
 ### Link Reference
@@ -126,7 +126,22 @@ link.
   [:markdown/reference
    {:title "Foo"
     :label "1"
-    :href "#baz"}]}
+    :url "#baz"}]}
+ "Bar"]
+```
+
+### Image Reference
+
+`:reference` (potentially `nil`) contains the `:markdown/reference` AST node of the referenced
+link. Same as link reference.
+
+```clojure
+[:markdown/image-ref
+ {:reference
+  [:markdown/reference
+   {:title "Foo"
+    :label "1"
+    :url "#baz"}]}
  "Bar"]
 ```
 
