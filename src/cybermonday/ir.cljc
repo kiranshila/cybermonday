@@ -10,24 +10,15 @@
 (defn close-tag? [tag]
   (when (string? tag)
     (and (= \/ (second tag))
-         (seq (re-matches #"<(.*)>" tag)))))
+         (not (nil? (seq (re-matches #"<(.*)>" tag)))))))
 
 (defn open-tag? [tag]
   (when (string? tag)
     (and (not= \/ (second tag))
-         (seq (re-matches #"<(.*)>" tag)))))
-
-(defn contains-open-tag? [vec]
-  (when (vector? vec)
-    (some open-tag? vec)))
-
-(defn contains-close-tag? [vec]
-  (when (vector? vec)
-    (some close-tag? vec)))
+         (not (nil? (seq (re-matches #"<(.*)>" tag)))))))
 
 (defn contains-inner-html? [vec]
-  (when (some vector? vec)
-    (some #(and (vector? %1) (open-tag? (second %1))) vec)))
+  (some #(= :markdown/html (first %)) (filter vector? vec)))
 
 (defn html-attr-to-map [attr]
   (let [[key value] (str/split attr #"=")]
@@ -49,16 +40,18 @@
     (completing
      (fn [r input]
        (cond
-         (contains-open-tag? input) (do
-                                      (vswap! state conj (parse-tag (second input)))
-                                      r)
-         (contains-close-tag? input) (let [thing (peek @state)]
-                                       (vswap! state pop)
-                                       (if (empty? @state)
-                                         (xf r thing)
-                                         (do
-                                           (vswap! state update (dec (count @state)) conj thing)
-                                           r)))
+         (and (vector? input)
+              (some open-tag? input)) (do
+                                        (vswap! state conj (parse-tag (get input 2))) ; [:markdown/html {} "tag"]
+                                        r)
+         (and (vector? input)
+              (some close-tag? input)) (let [thing (peek @state)]
+                                         (vswap! state pop)
+                                         (if (empty? @state)
+                                           (xf r thing)
+                                           (do
+                                             (vswap! state update (dec (count @state)) conj thing)
+                                             r)))
          :else (if (empty? @state)
                  (xf r input)
                  (do
@@ -99,7 +92,3 @@
     (->> (parser/to-hiccup document)
          process-inline-html
          cleanup-whitespace)))
-
-(def test-str "Here is a footnote reference,[^1]
-
-[^1]: Here is the footnote.")

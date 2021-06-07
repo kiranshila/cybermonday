@@ -162,7 +162,7 @@
          str))
   HtmlInline
   (to-hiccup [this]
-    [:markdown/html (str (.getChars this))])
+    [:markdown/html {} (str (.getChars this))])
   AttributesNode
   (to-hiccup [this]
     [:markdown/attributes (into {} (for [attribute (.getChildren this)
