@@ -8,7 +8,7 @@ representation (IR). Some nodes (say like `BulletListItem` and
 prevent the user from disambiguating between them and prevent special case
 post-processing. Some nodes, given below, are unambiguous, so their
 corresponding HTML tag is fed through, and as such, these IR AST nodes are
-completely valid hiccup. However, we want to be able to still provide the
+completely valid HTML hiccup. However, we want to be able to still provide the
 ability to transform these as need be.
 
 So, the AST nodes are broken into two categories:
@@ -28,7 +28,7 @@ into final html hiccup.
 Every IR node will have the form
 
 ```clojure
-[:cybermonday.parser/keyword attr-map & body]
+[:markdown/keyword attr-map & body]
 ```
 
 Please note that some of these are Flexmark specific and not available in remark
@@ -37,25 +37,25 @@ Please note that some of these are Flexmark specific and not available in remark
 ### Bullet List Item
 
 ```clojure
-[:cybermonday.parser/bullet-list-item {} "Item"]
+[:markdown/bullet-list-item {} "Item"]
 ```
 
 ### Ordered List Item
 
 ```clojure
-[:cybermonday.parser/ordered-list-item {} "Item"]
+[:markdown/ordered-list-item {} "Item"]
 ```
 
 ### Hard Line Break
 
 ```clojure
-[:cybermonday.parser/hard-line-break {}]
+[:markdown/hard-line-break {}]
 ```
 
 ### Soft Line Break
 
 ```clojure
-[:cybermonday.parser/soft-line-break {}]
+[:markdown/soft-line-break {}]
 ```
 
 ### Heading
@@ -64,7 +64,7 @@ Please note that some of these are Flexmark specific and not available in remark
 `:level` will take integer values 1-6.
 
 ```clojure
-[:cybermonday.parser/heading {:level 1 :id "my-heading"} "Heading"]
+[:markdown/heading {:level 1 :id "my-heading"} "Heading"]
 ```
 
 ### Fenced Code Block
@@ -72,19 +72,19 @@ Please note that some of these are Flexmark specific and not available in remark
 `:language` (potentially `nil`) is a string of the tagged language.
 
 ```clojure
-[:cybermonday.parser/fenced-code-block {:language "julia"} "code"]
+[:markdown/fenced-code-block {:language "julia"} "code"]
 ```
 
 ### Indented Code Block
 
 ```clojure
-[:cybermonday.parser/indented-code-block {} "code"]
+[:markdown/indented-code-block {} "code"]
 ```
 
 ### Table Separator
 
 ```clojure
-[:cybermonday.parser/table-separator]
+[:markdown/table-separator]
 ```
 
 ### Table Cell
@@ -93,7 +93,7 @@ Please note that some of these are Flexmark specific and not available in remark
 `:alignment` (potentially `nil`) will indicate cell alignment ("left", "right", or "center")
 
 ```clojure
-[:cybermonday.parser/table-cell {:header? true :alignment "center"}]
+[:markdown/table-cell {:header? true :alignment "center"}]
 ```
 
 ### Link
@@ -112,18 +112,18 @@ Please note that some of these are Flexmark specific and not available in remark
 `:href` contains the reference url
 
 ```clojure
-[:cybermonday.parser/reference {:title "Title", :label "1", :href "/url"}]
+[:markdown/reference {:title "Title", :label "1", :href "/url"}]
 ```
 
 ### Link Reference
 
-`:reference` (potentially `nil`) contains the `:cybermonday.parser/reference` AST node of the referenced
+`:reference` (potentially `nil`) contains the `:markdown/reference` AST node of the referenced
 link.
 
 ```clojure
-[:cybermonday.parser/link-ref
+[:markdown/link-ref
  {:reference
-  [:cybermonday.parser/reference
+  [:markdown/reference
    {:title "Foo"
     :label "1"
     :href "#baz"}]}
@@ -145,7 +145,7 @@ link.
 `:href` contains the link url
 
 ```clojure
-[:cybermonday.parser/autolink {:href "www.foo.bar"}]
+[:markdown/autolink {:href "www.foo.bar"}]
 ```
 
 ### Mail Link
@@ -153,13 +153,13 @@ link.
 `:address` contains the email address
 
 ```clojure
-[:cybermonday.parser/mail-link {:address "you@example.com"}]
+[:markdown/mail-link {:address "you@example.com"}]
 ```
 
 ### HTML Comments
 
 ```clojure
-[:cybermonday.parser/html-comment {} "I'm a comment!"]
+[:markdown/html-comment {} "I'm a comment!"]
 ```
 
 ## Non Commonmark Extensions
@@ -171,7 +171,7 @@ might want to choose the rendering backend, unlike GitLab - the default
 translation to HTML will be as is as text.
 
 ```clojure
-[:cybermonday.parser/inline-math {} "y=mx+b"]
+[:markdown/inline-math {} "y=mx+b"]
 ```
 
 ### Attributes
@@ -186,7 +186,7 @@ difficult. If a need for this feature comes up, it might be worth looking into,
 but the primary use case of heading `:id`s is unaffected.
 
 ```clojure
-[:cybermonday.parser/attributes {:key "value"}]
+[:markdown/attributes {:key "value"}]
 ```
 
 ### Definitions
@@ -214,7 +214,7 @@ Enables footnotes in the common format. Details [here](https://github.com/vsch/f
 `:id` contains the footnote id
 
 ```clojure
-[:cybermonday.parser/footnote {:id "1"}]
+[:markdown/footnote {:id "1"}]
 ```
 
 #### Footnote Block
@@ -223,7 +223,7 @@ Enables footnotes in the common format. Details [here](https://github.com/vsch/f
 `:content` contains the footnote content
 
 ```clojure
-[:cybermonday.parser/footnote-block {:id "1" :content "I'm a footnote"}]
+[:markdown/footnote-block {:id "1" :content "I'm a footnote"}]
 ```
 
 # Lowering Extension Examples
@@ -239,10 +239,12 @@ delimiters enables math rendering
 ```clojure
 (ns my-library
   (:require
-   [cybermonday.lowering :refer [lower]]))
+   [cybermonday.core :as cn]))
 
-(defmethod lower :markdown/inline-math [[_ attrs & [math]]]
+(defn parse-math [[_ _ & [math]]]
   (str "$$" math "$$"))
+
+(cm/parse-md "$`y=mx+b`$" {:markdown/inline-math parse-math})
 ```
 
 ## HTML comment-based content divider
@@ -255,11 +257,13 @@ part of the parse tree, we can capture this specific result.
 (ns my-library
   (:require
    [clojure.string :as str]
-   [cybermonday.lowering :refer [lower]]))
+   [cybermonday.core :as cm]))
 
-(defmethod lower :markdown/html-comment [[_ body]]
+(defn content-split [[_ _ body]]
   (when (str/includes? body "more")
     [:div {:class "content-split"}]))
+
+(cm/parse-md "<!--more-->" {:markdown/html-comment content-split})
 ```
 
 ## Anchor Links
@@ -273,18 +277,21 @@ by customizing the `:markdown/heading` lowering.
   (:require
    [clojure.string :as str]
    [cybermonday.utils :refer [gen-id make-hiccup-node]]
-   [cybermonday.lowering :refer [lower]]))
+   [cybermonday.core :as cm]))
 
-(defmethod lower :markdown/heading [[_ attrs & body :as node]]
+(defn lower-heading [[_ attrs & body :as node]]
   (make-hiccup-node
    (keyword (str "h" (:level attrs)))
    (dissoc
-    (assoc attrs
-           :id (if (nil? (:id attrs))
-                 (gen-id node)
-                 (:id attrs))
-           :class "anchor"
-           :href (str "#" id))
+    (let [id (if (nil? (:id attrs))
+               (gen-id node)
+               (:id attrs))]
+      (assoc attrs
+             :id id
+             :class "anchor"
+             :href (str "#" id)))
     :level)
    body))
+
+(parse-md "# A Heading" {:markdown/heading lower-heading})
 ```
