@@ -78,8 +78,8 @@
     (if (and start-pos
              (= \< (aget source (.. start-pos -start -offset)))) ; Autolink check
       (if (str/starts-with? url "mailto:")
-        (make-hiccup-node :markdown/mail-link {:address (subs url 7)})
-        (make-hiccup-node :markdown/autolink {:href url}))
+        [:markdown/mail-link {:address (subs url 7)}]
+        [:markdown/autolink {:href url}])
       (make-hiccup-node :a
                         {:href url
                          :title (.-title this)}
