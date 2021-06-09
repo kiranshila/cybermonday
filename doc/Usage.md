@@ -6,7 +6,12 @@ the (possibly nil) parsed YAML metadata from the file and the body is the HTML
 hiccup.
 
 To customize the parsing, see the AST transformations. The lowering step is done
-through a multimethod, for which the cybermonday IR nodes can be individually customized.
+through a map from IR node type to lowering fn. To provide customization, pass
+in a map to `parse-md` that overloads the defaults.
+
+```clojure
+(parse-md my-md-string {:markdown/node lower-node-fn})
+```
 
 ## ClojureScript
 

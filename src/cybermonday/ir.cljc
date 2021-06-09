@@ -89,6 +89,6 @@
   Inline HTML gets folded inplace and excess whitespace is removed"
   [md]
   (let [document (.parse parser/parser md)]
-    (->> (parser/to-hiccup document)
+    (->> (parser/to-hiccup document md)
          process-inline-html
          cleanup-whitespace)))

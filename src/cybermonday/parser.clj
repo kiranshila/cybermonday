@@ -80,100 +80,100 @@
 
 (defprotocol HiccupRepresentable
   "Provides the protocol for `(to-hiccup)` method. Dispatches  on AST node type"
-  (to-hiccup [this]))
+  (to-hiccup [this _]))
 
-(defn map-children-to-hiccup [node]
-  (map #(to-hiccup %) (.getChildren node)))
+(defn map-children-to-hiccup [node source]
+  (map #(to-hiccup % source) (.getChildren node)))
 
 (extend-protocol HiccupRepresentable
   Node
-  (to-hiccup [this]
+  (to-hiccup [this source]
     (make-hiccup-node (node-to-tag this)
-                      (map-children-to-hiccup this)))
+                      (map-children-to-hiccup this source)))
   Text
-  (to-hiccup [this]
+  (to-hiccup [this _]
     (str (.getChars this)))
   Heading
-  (to-hiccup [this]
+  (to-hiccup [this source]
     (make-hiccup-node :markdown/heading
                       {:level (.getLevel this)
                        :id (not-empty (.getAnchorRefId this))}
-                      (map-children-to-hiccup this)))
+                      (map-children-to-hiccup this source)))
   FencedCodeBlock
-  (to-hiccup [this]
+  (to-hiccup [this source]
     (make-hiccup-node :markdown/fenced-code-block
                       {:language (str (.getInfo this))}
-                      (map-children-to-hiccup this)))
+                      (map-children-to-hiccup this source)))
   IndentedCodeBlock
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/indented-code-block {} (str (.getContentChars this))])
   TableCell
-  (to-hiccup [this]
+  (to-hiccup [this source]
     (make-hiccup-node :markdown/table-cell
                       {:header? (.isHeader this)
                        :alignment (not-empty (str/lower-case (str (.getAlignment this))))}
-                      (map-children-to-hiccup this)))
+                      (map-children-to-hiccup this source)))
   HtmlBlockBase
-  (to-hiccup [this]
+  (to-hiccup [this _]
     (h/as-hiccup (first (h/parse-fragment (str (.getContentChars this))))))
   Link
-  (to-hiccup [this]
+  (to-hiccup [this source]
     (make-hiccup-node :a
                       {:href (str (.getUrl this))
                        :title (not-empty (str (.getTitle this)))}
-                      (map-children-to-hiccup this)))
+                      (map-children-to-hiccup this source)))
   Reference
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/reference {:title (not-empty (str (.getTitle this)))
                           :label (str (.getReference this))
                           :url (str (.getUrl this))}])
   LinkRef
-  (to-hiccup [this]
+  (to-hiccup [this source]
     (make-hiccup-node :markdown/link-ref
                       {:reference (-> (.getDocument this)
                                       (.get Parser/REFERENCES)
                                       (get (str (.getReference this)))
-                                      to-hiccup)}
-                      (map-children-to-hiccup this)))
+                                      (#(to-hiccup % source)))}
+                      (map-children-to-hiccup this source)))
 
   ImageRef
-  (to-hiccup [this]
+  (to-hiccup [this source]
     (make-hiccup-node :markdown/image-ref
                       {:reference (-> (.getDocument this)
                                       (.get Parser/REFERENCES)
                                       (get (str (.getReference this)))
-                                      to-hiccup)}
-                      (map-children-to-hiccup this)))
+                                      (#(to-hiccup % source)))}
+                      (map-children-to-hiccup this source)))
   Image
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:img {:src (str (.getUrl this))
            :alt (str (.getText this))
            :title (not-empty (str (.getTitle this)))}])
   AutoLink
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/autolink {:href (str (.getUrl this))}])
   MailLink
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/mail-link {:address (str (.getText this))}])
   HtmlCommentBlock
-  (to-hiccup [this]
+  (to-hiccup [this _]
     (let [[_ comment] (re-matches html-comment-re (str (.getChars this)))]
       [:markdown/html-comment {} comment]))
   GitLabInlineMath
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/inline-math {} (str (.getText this))])
   HtmlEntity
-  (to-hiccup [this]
+  (to-hiccup [this _]
     (->> (.getChars this)
          str
          h/parse-fragment
          first
          str))
   HtmlInline
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/html {} (str (.getChars this))])
   AttributesNode
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/attributes (into {} (for [attribute (.getChildren this)
                                          :let [name (str (.getName attribute))
                                                value (str (.getValue attribute))]]
@@ -182,12 +182,12 @@
                                        (.isClass attribute) [:class value]
                                        :else [(keyword name) (if (not-empty value) value true)])))])
   Footnote
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/footnote {:id (str (.getText this))}])
   FootnoteBlock
-  (to-hiccup [this]
+  (to-hiccup [this _]
     [:markdown/footnote-block {:id (str (.getText this))
                                :content (str (.getFootnote this))}])
   nil
-  (to-hiccup [this]
+  (to-hiccup [this _]
     nil))

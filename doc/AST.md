@@ -185,11 +185,16 @@ From the GitLab extension. Inline math is delimited with `$\`y=mx+b\`$`. As one
 might want to choose the rendering backend, unlike GitLab - the default
 translation to HTML will be as is as text.
 
+There is no syntax for block math, so the "recommendation" is to use a fenced
+code block with an appropriate language.
+
 ```clojure
 [:markdown/inline-math {} "y=mx+b"]
 ```
 
 ### Attributes
+
+Currently Java-only
 
 Following the details from the [flexmark
 spec](https://github.com/vsch/flexmark-java/wiki/Attributes-Extension). Cybermonday differs from the default
@@ -205,6 +210,8 @@ but the primary use case of heading `:id`s is unaffected.
 ```
 
 ### Definitions
+
+Currently Java-only
 
 From the [PHP Markdown Extra Definition
 List](https://michelf.ca/projects/php-markdown/extra/#def-list).
