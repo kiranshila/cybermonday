@@ -1,6 +1,6 @@
 (ns cybermonday.core
   (:require
-   [cybermonday.lowering :refer [to-html-hiccup default-lowering]]
+   [cybermonday.lowering :refer [to-html-hiccup]]
    [cybermonday.ir :refer [md-to-ir]]
    #?(:clj [clj-yaml.core :as yaml]
       :cljs ["yaml" :as yaml])))
@@ -11,11 +11,12 @@
                    :cljs yaml/parse))
 
 (defn parse-md
-  "Generates HTML hiccup from markdown and associated frontmatter"
-  ([md lowering-map]
+  "Generates HTML hiccup from markdown and associated frontmatter
+  See `cybermonday.lowering/to-html-hiccup` for opts map values"
+  ([md opts]
    (let [[_ fm body] (re-matches frontmatter-re md)]
      {:frontmatter (when fm (parse-yaml fm))
       :body (-> body
                 md-to-ir
-                (to-html-hiccup lowering-map))}))
-  ([md] (parse-md md default-lowering)))
+                (to-html-hiccup opts))}))
+  ([md] (parse-md md nil)))

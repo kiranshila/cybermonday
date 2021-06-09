@@ -5,12 +5,17 @@ function yields a map with `:frontmatter` and `:body` where the frontmatter is
 the (possibly nil) parsed YAML metadata from the file and the body is the HTML
 hiccup.
 
-To customize the parsing, see the AST transformations. The lowering step is done
-through a map from IR node type to lowering fn. To provide customization, pass
-in a map to `parse-md` that overloads the defaults.
+To customize the lowering, see the AST transformations for IR node format. The
+lowering step is done through a map from IR node type to lowering fn as
+`:lower-fns` in the options map to `parse-md`.
+
+Additionally, the options map accepts `:default-attrs` as a map from HTML tag
+keyword to default attributes so you can set classes, styles, etc. for all nodes
+of a given tag.
 
 ```clojure
-(parse-md my-md-string {:markdown/node lower-node-fn})
+(parse-md my-md-string {:lower-fns {:markdown/node lower-node-fn}
+                        :default-attrs {:p {:style {:color :red}}}})
 ```
 
 ## ClojureScript

@@ -120,9 +120,30 @@
       ir)))
   ([ir] (lower-ir ir default-lowering)))
 
+(defn deep-merge
+  "Recursively merges maps and vectors"
+  [& contents]
+  (cond
+    (every? vector? contents) (reduce into contents)
+    (some map? contents) (apply merge-with deep-merge contents)))
+
+(defn apply-post-attrs
+  "Merges in attributes for the final HTML ast from given map of html keywords and attributes"
+  [hiccup attr-map]
+  (walk/postwalk
+   (fn [item]
+     (if (hiccup? item)
+       (let [[tag attrs body] item]
+         [tag (deep-merge attrs (attr-map tag)) body])
+       item))
+   hiccup))
+
 (defn to-html-hiccup
-  "Transforms a cybermonday IR into standard HTML hiccup"
-  ([ir lowering-map]
-   (-> (merge-attributes ir)
-       (lower-ir lowering-map)))
-  ([ir] (to-html-hiccup ir default-lowering)))
+  "Transforms a cybermonday IR into standard HTML hiccup
+  In an optional options map:
+  `:lower-fns` supplies a mapping from IR keyword to lowering fn
+  `default-attrs` supplies a mapping from HTML keyword to default node attributes"
+  [ir & [{:keys [lower-fns default-attrs]}]]
+  (-> (merge-attributes ir)
+      (lower-ir (or lower-fns default-lowering))
+      (apply-post-attrs (or default-attrs {}))))
