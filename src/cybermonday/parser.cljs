@@ -60,9 +60,7 @@
         lang (.-lang this)
         body (.-value this)]
     (case (aget source start-pos)
-      "`"  [:markdown/fenced-code-block
-            {:language lang}
-            body]
+      "`"  [:markdown/fenced-code-block {:language lang} body]
       " "  [:markdown/indented-code-block {} body]
       "\t" [:markdown/indented-code-block {} body])))
 
@@ -86,17 +84,22 @@
                         (transform-children this defs source)))))
 
 (defmethod transform "table" [this defs source]
-  (let [alignment (.-align this)]
-    (make-hiccup-node
-     :table
-     (for [[i row] (map-indexed vector (.-children this))]
+  (let [alignment (.-align this)
+        rows (.-children this)]
+    (letfn [(hiccup-each-cell [row header?]
+              (for [[j cell] (map-indexed vector (.-children row))]
+                (make-hiccup-node
+                 :markdown/table-cell
+                 {:header? header?
+                  :alignment (get alignment j)}
+                 (transform-children cell defs source))))]
+      [:table {}
+       [:thead {}
+        (make-hiccup-node :tr (hiccup-each-cell (first rows) true))]
        (make-hiccup-node
-        :tr
-        (for [[j cell] (map-indexed vector (.-children row))]
-          (make-hiccup-node :markdown/table-cell
-                            {:header? (= i 0)
-                             :alignment (get alignment j)}
-                            (transform-children cell defs source))))))))
+        :tbody
+        (for [row (rest rows)]
+          (make-hiccup-node :tr (hiccup-each-cell row false))))])))
 
 (defmethod transform "linkReference" [this defs source]
   (make-hiccup-node :markdown/link-ref

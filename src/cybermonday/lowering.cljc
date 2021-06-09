@@ -8,7 +8,7 @@
   {:markdown/bullet-list-item :li
    :markdown/ordered-list-item :li
    :markdown/hard-line-break :br
-   :markdown/inline-math :pre
+   :markdown/inline-math :code
    :markdown/autolink :a
    :markdown/html-comment nil
    :markdown/soft-line-break nil

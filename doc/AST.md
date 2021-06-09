@@ -83,6 +83,8 @@ Please note that some of these are Flexmark specific and not available in remark
 
 ### Table Separator
 
+Currently Java only
+
 ```clojure
 [:markdown/table-separator]
 ```
@@ -181,9 +183,7 @@ link. Same as link reference.
 
 ### Inline Math
 
-From the GitLab extension. Inline math is delimited with `$\`y=mx+b\`$`. As one
-might want to choose the rendering backend, unlike GitLab - the default
-translation to HTML will be as is as text.
+From the GitLab extension. Inline math is delimited with `$\`y=mx+b\`$`. As one might want to choose the rendering backend, unlike GitLab - the default translation to HTML will be as is as text in a `:pre` block.
 
 There is no syntax for block math, so the "recommendation" is to use a fenced
 code block with an appropriate language.
