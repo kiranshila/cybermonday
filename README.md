@@ -5,6 +5,12 @@
 [![Clojars Project](https://img.shields.io/clojars/v/com.kiranshila/cybermonday.svg)](https://clojars.org/com.kiranshila/cybermonday)
 [![cljdoc badge](https://cljdoc.org/badge/com.kiranshila/cybermonday)](https://cljdoc.org/d/com.kiranshila/cybermonday/CURRENT)
 
+Cybermonday provides a Clojure(Script) interface to working with markdown as a hiccup AST. Beyond commonmark, GFM tables and a few other features are added. A default implementation is provided to transform this markdown IR to HTML hiccup for rendering.
+
+Try it out here on the [test app](https://kiranshila.github.io/cybermonday-test-app/)!
+
+## Motivation
+
 I've been frustrated with the space of Markdown manipulation in Clojure. Most
 libraries provide parsing to raw html, which is fine if you have a
 straightforward way to include that in whatever you are targeting. If however,
