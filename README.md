@@ -32,7 +32,7 @@ strikethroughs, footnotes, generic attributes, definitions, math, and more! This
 even supports inline html and html around markdown-formated text.
 
 However, `cybermonday` also provides access to a hiccup representation of the
-Flexmark (and remark) AST and the multimethod to provide the final pass transformation from
+Flexmark (and remark) AST and the methods to provide the final pass transformation from
 this intermediate representation to HTML. This allows the user to customize how the raw markdown AST
 gets transformed into html, allowing for easy extension and customization.
 
