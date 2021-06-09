@@ -133,8 +133,8 @@
   (walk/postwalk
    (fn [item]
      (if (hiccup? item)
-       (let [[tag attrs body] item]
-         [tag (deep-merge attrs (attr-map tag)) body])
+       (let [[tag attrs & body] item]
+         (apply vector tag (deep-merge attrs (attr-map tag)) body))
        item))
    hiccup))
 
