@@ -5,10 +5,36 @@
 [![Clojars Project](https://img.shields.io/clojars/v/com.kiranshila/cybermonday.svg)](https://clojars.org/com.kiranshila/cybermonday)
 [![cljdoc badge](https://cljdoc.org/badge/com.kiranshila/cybermonday)](https://cljdoc.org/d/com.kiranshila/cybermonday/CURRENT)
 
-Cybermonday provides a Clojure(Script) interface to working with markdown as a hiccup AST. Beyond commonmark, GFM tables and a few other features are added. A default implementation is provided to transform this markdown IR to HTML hiccup for rendering.
+Cybermonday provides a Clojure(Script) interface to working with markdown as a hiccup AST. Beyond CommonMark, GFM tables, tasklists and a few other features are added. A default implementation is provided to transform this markdown IR to HTML hiccup for rendering.
 
 Try it out here on the [test app](https://kiranshila.github.io/cybermonday-test-app/)!
 
+## Usage
+Simply add this library to your Clojure(Script) project, grab some markdown as a string, and run
+```clojure
+(cybermonday.core/parse-md my-markdown-str)
+```
+to get an HTML hiccup representation of your markdown.
+
+If you want the IR directly:
+```clojure
+(cybermonday.ir/md-to-ir my-markdown-str)
+```
+
+Extending the lowering step is easy, with an options map provided to set default attributes for the HTML tags and custom lowering fns.
+For example, say we want to use a react component from Reagent to render math and make all paragraph tags use my custom class. This is as simple as
+```clojure
+(ns main.core
+  (:require
+   [cybermonday.core :as cm]
+   ["@matejmazur/react-katex" :as TeX]))
+
+(defn lower-inline-math [[_ _ math]]
+  [:> TeX {:math math}])
+
+(cm/parse-md markdown {:default-attrs {:p {:class ["my-class"]}}
+                       :lower-fns {:markdown/inline-math lower-inline-math}}
+```
 ## Motivation
 
 I've been frustrated with the space of Markdown manipulation in Clojure. Most
