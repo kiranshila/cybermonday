@@ -81,23 +81,6 @@ Please note that some of these are Flexmark specific and not available in remark
 [:markdown/indented-code-block {} "code"]
 ```
 
-### Table Separator
-
-Currently Java only
-
-```clojure
-[:markdown/table-separator]
-```
-
-### Table Cell
-
-`:header?` is a boolean indicating whether this cell is a header.
-`:alignment` (potentially `nil`) will indicate cell alignment ("left", "right", or "center")
-
-```clojure
-[:markdown/table-cell {:header? true :alignment "center"}]
-```
-
 ### Link
 
 `:href` specifies the link url
@@ -157,22 +140,6 @@ link. Same as link reference.
 [:img {:src "cat.png" :alt "Witty alt-text" :title "More info"}]
 ```
 
-### Auto Link
-
-`:href` contains the link url
-
-```clojure
-[:markdown/autolink {:href "www.foo.bar"}]
-```
-
-### Mail Link
-
-`:address` contains the email address
-
-```clojure
-[:markdown/mail-link {:address "you@example.com"}]
-```
-
 ### HTML Comments
 
 ```clojure
@@ -181,7 +148,56 @@ link. Same as link reference.
 
 ## Non Commonmark Extensions
 
-### Inline Math
+### Github Flavored Markdown
+
+#### Task Lists
+
+GitHub-style lists of check boxes
+`:checked?` indicates the checked state
+`:ordered?` indicates whether the list item is in an ordered context
+
+```clojure
+[:markdown/task-list-item
+  {:checked? false, :ordered? false}
+  [:p {} "Unchecked and unordered"]]
+```
+
+#### Auto Link
+
+`:href` contains the link url
+
+```clojure
+[:markdown/autolink {:href "www.foo.bar"}]
+```
+
+#### Mail Link
+
+`:address` contains the email address
+
+```clojure
+[:markdown/mail-link {:address "you@example.com"}]
+```
+
+#### Table Separator
+
+Currently Java only
+
+```clojure
+[:markdown/table-separator]
+```
+
+#### Table Cell
+
+`:header?` is a boolean indicating whether this cell is a header.
+`:alignment` (potentially `nil`) will indicate cell alignment ("left", "right", or "center")
+
+```clojure
+[:markdown/table-cell {:header? true :alignment "center"}]
+```
+
+### GitLab Flavored Markdown
+
+#### Inline Math
 
 From the GitLab extension. Inline math is delimited with `$\`y=mx+b\`$`. As one might want to choose the rendering backend, unlike GitLab - the default translation to HTML will be as is as text in a `:pre` block.
 
@@ -192,7 +208,9 @@ code block with an appropriate language.
 [:markdown/inline-math {} "y=mx+b"]
 ```
 
-### Attributes
+### Generic Markdown Extensions
+
+#### Attributes
 
 Currently Java-only
 
@@ -209,7 +227,7 @@ but the primary use case of heading `:id`s is unaffected.
 [:markdown/attributes {:key "value"}]
 ```
 
-### Definitions
+#### Definitions
 
 Currently Java-only
 
@@ -227,7 +245,7 @@ item bodies can of course contain additional hiccup.
   [:dd {} [:p {} "Bar"]]]
 ```
 
-### Footnotes
+#### Footnotes
 
 Enables footnotes in the common format. Details [here](https://github.com/vsch/flexmark-java/wiki/Footnotes-Extension)
 

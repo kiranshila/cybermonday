@@ -70,6 +70,15 @@
     [:img {:src (:url (second reference))
            :title (:title (second reference))} body]))
 
+(defn lower-task-list-item [[_ {:keys [checked?]} & body]]
+  [:li {}
+   [make-hiccup-node
+    :input
+    {:checked checked?
+     :disabled true
+     :type "checkbox"}
+    body]])
+
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
     (when-let [new-tag (default-tags tag)]
@@ -85,6 +94,7 @@
    :markdown/mail-link lower-mail-link
    :markdown/footnote lower-footnote
    :markdown/footnote-block lower-footnote-block
+   :markdown/task-list-item lower-task-list-item
    :markdown/link-ref lower-link-ref
    :markdown/image-ref lower-image-ref})
 

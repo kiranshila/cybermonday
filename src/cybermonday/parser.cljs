@@ -52,8 +52,24 @@
                     (transform-children this defs source)))
 
 (defmethod transform "list" [this defs source]
-  (make-hiccup-node (if (.-ordered this) :ol :ul)
-                    (transform-children this defs source)))
+  (let [ordered? (.-ordered this)
+        li-type (if ordered?
+                  :markdown/ordered-list-item
+                  :markdown/bullet-list-item)]
+    (make-hiccup-node
+     (if ordered? :ol :ul)
+     (for [child (.-children this)
+           :let [checked? (.-checked child)
+                 li-type (if (nil? checked?)
+                           li-type
+                           :markdown/task-list-item)]]
+       (make-hiccup-node
+        li-type
+        (if (nil? checked?)
+          {}
+          {:checked? checked?
+           :ordered? ordered?})
+        (transform-children child defs source))))))
 
 (defmethod transform "code" [this _ source]
   (let [start-pos (.. this -position -start -offset)

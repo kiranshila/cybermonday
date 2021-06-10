@@ -19,6 +19,7 @@
    (com.vladsch.flexmark.ext.definition DefinitionExtension DefinitionList DefinitionTerm DefinitionItem)
    (com.vladsch.flexmark.ext.footnotes FootnoteExtension Footnote FootnoteBlock)
    (com.vladsch.flexmark.ext.gfm.strikethrough StrikethroughExtension Strikethrough)
+   (com.vladsch.flexmark.ext.gfm.tasklist TaskListExtension TaskListItem)
    (com.vladsch.flexmark.test.util AstCollectingVisitor)
    (com.vladsch.flexmark.ext.gitlab GitLabExtension GitLabInlineMath)))
 
@@ -33,6 +34,7 @@
             (DefinitionExtension/create)
             (AttributesExtension/create)
             (StrikethroughExtension/create)
+            (TaskListExtension/create)
             (GitLabExtension/create)])
       (toImmutable)))
 
@@ -188,6 +190,13 @@
   (to-hiccup [this _]
     [:markdown/footnote-block {:id (str (.getText this))
                                :content (str (.getFootnote this))}])
+  TaskListItem
+  (to-hiccup [this source]
+    (make-hiccup-node
+     :markdown/task-list-item
+     {:checked? (.isItemDoneMarker this)
+      :ordered? (.isOrderedItem this)}
+     (map-children-to-hiccup this source)))
   nil
   (to-hiccup [this _]
     nil))
