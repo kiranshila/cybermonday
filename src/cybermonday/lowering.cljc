@@ -71,13 +71,9 @@
            :title (:title (second reference))} body]))
 
 (defn lower-task-list-item [[_ {:keys [checked?]} & body]]
-  [:li {}
-   (make-hiccup-node
-    :input
-    {:checked checked?
-     :disabled true
-     :type "checkbox"}
-    body)])
+  (make-hiccup-node
+   :li
+   (conj body [:input {:checked checked? :disabled true :type "checkbox"}])))
 
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
