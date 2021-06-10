@@ -9,7 +9,6 @@
    :markdown/ordered-list-item :li
    :markdown/hard-line-break :br
    :markdown/inline-math :code
-   :markdown/autolink :a
    :markdown/html-comment nil
    :markdown/soft-line-break nil
    :markdown/attributes nil
@@ -47,6 +46,9 @@
 
 (defn lower-mail-link [[_ {:keys [address] :as attrs}]]
   [:a (dissoc (assoc attrs :href (str "mailto:" address)) :address)])
+
+(defn lower-autolink [[_ {:keys [href]}]]
+  [:a {:href href} href])
 
 ; FIXME pretty footnotes at bottom
 
@@ -89,6 +91,7 @@
    :markdown/table-cell lower-table-cell
    :markdown/mail-link lower-mail-link
    :markdown/footnote lower-footnote
+   :markdown/autolink lower-autolink
    :markdown/footnote-block lower-footnote-block
    :markdown/task-list-item lower-task-list-item
    :markdown/link-ref lower-link-ref

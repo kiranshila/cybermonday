@@ -4,7 +4,7 @@
   <packaging>jar</packaging>
   <groupId>com.kiranshila</groupId>
   <artifactId>cybermonday</artifactId>
-  <version>0.0.31</version>
+  <version>0.0.32</version>
   <name>cybermonday</name>
   <dependencies>
     <dependency>
