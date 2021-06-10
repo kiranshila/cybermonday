@@ -72,12 +72,12 @@
 
 (defn lower-task-list-item [[_ {:keys [checked?]} & body]]
   [:li {}
-   [make-hiccup-node
+   (make-hiccup-node
     :input
     {:checked checked?
      :disabled true
      :type "checkbox"}
-    body]])
+    body)])
 
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
