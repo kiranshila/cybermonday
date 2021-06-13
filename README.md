@@ -28,7 +28,7 @@ more sense to wrap the excellent Flexmark (java) and Remark (js) markdown parser
 most basic level, `cybermonday` provides a top level function `parse-md`
 that gives you a nice, reagent-renderable representation of your source. This
 includes all of the CommonMark spec as well as the best features of popular extensions such as tables,
-strikethroughs, footnotes, generic attributes, definitions, math, and more! This
+strikethroughs, footnotes, math, and more! This
 even supports inline html and html around markdown-formated text.
 
 However, `cybermonday` also provides access to a hiccup representation of the
