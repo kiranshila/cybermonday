@@ -40,3 +40,13 @@
        str/lower-case))
 
 (def html-comment-re #"<!--([\s\S]*?)-->")
+
+(defn cleanup-whitespace
+  "Removes excess whitespace from the resulting AST."
+  [hiccup]
+  (walk/postwalk
+   (fn [item]
+     (cond
+       (string? item) (when (not (str/blank? item)) item)
+       :else item))
+   hiccup))

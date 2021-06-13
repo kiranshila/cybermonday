@@ -210,41 +210,6 @@ code block with an appropriate language.
 
 ### Generic Markdown Extensions
 
-#### Attributes
-
-Currently Java-only
-
-Following the details from the [flexmark
-spec](https://github.com/vsch/flexmark-java/wiki/Attributes-Extension). Cybermonday differs from the default
-configuration as `ASSIGN_TEXT_ATTRIBUTES` is set to false. This implies that
-inline attributes will always configure the parent element. This is due to the
-fact that the way the Flexmark AST is built for the extended behavior, merging
-attributes into leaves at the same level makes the transformation much more
-difficult. If a need for this feature comes up, it might be worth looking into,
-but the primary use case of heading `:id`s is unaffected.
-
-```clojure
-[:markdown/attributes {:key "value"}]
-```
-
-#### Definitions
-
-Currently Java-only
-
-From the [PHP Markdown Extra Definition
-List](https://michelf.ca/projects/php-markdown/extra/#def-list).
-
-#### Definition List, Term, and Items
-
-The definition list contains the term and item children nodes. The term and
-item bodies can of course contain additional hiccup.
-
-```clojure
- [:dl {}
-  [:dt {} "Foo"]
-  [:dd {} [:p {} "Bar"]]]
-```
-
 #### Footnotes
 
 Enables footnotes in the common format. Details [here](https://github.com/vsch/flexmark-java/wiki/Footnotes-Extension)

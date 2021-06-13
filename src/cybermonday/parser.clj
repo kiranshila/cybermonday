@@ -15,8 +15,6 @@
     HtmlCommentBlock HtmlEntity)
    (com.vladsch.flexmark.ext.tables
     TablesExtension TableBlock TableHead TableRow TableCell TableBody TableBody TableSeparator)
-   (com.vladsch.flexmark.ext.attributes AttributesExtension AttributesNode)
-   (com.vladsch.flexmark.ext.definition DefinitionExtension DefinitionList DefinitionTerm DefinitionItem)
    (com.vladsch.flexmark.ext.footnotes FootnoteExtension Footnote FootnoteBlock)
    (com.vladsch.flexmark.ext.gfm.strikethrough StrikethroughExtension Strikethrough)
    (com.vladsch.flexmark.ext.gfm.tasklist TaskListExtension TaskListItem)
@@ -27,12 +25,9 @@
   "The default options for the Flexmark parser
   There shouldn't be a reason to change this"
   (.. (MutableDataSet.)
-      (set AttributesExtension/ASSIGN_TEXT_ATTRIBUTES false)
       (set Parser/EXTENSIONS
            [(TablesExtension/create)
             (FootnoteExtension/create)
-            (DefinitionExtension/create)
-            (AttributesExtension/create)
             (StrikethroughExtension/create)
             (TaskListExtension/create)
             (GitLabExtension/create)])
@@ -69,10 +64,7 @@
    TableHead :thead
    TableBody :tbody
    TableRow :tr
-   BlockQuote :blockquote
-   DefinitionList :dl
-   DefinitionTerm :dt
-   DefinitionItem :dd})
+   BlockQuote :blockquote})
 
 (defn node-to-tag
   "Gets the default tag for this `node` or throws an error if we encounter a node we aren't handling."
@@ -174,15 +166,6 @@
   HtmlInline
   (to-hiccup [this _]
     [:markdown/html {} (str (.getChars this))])
-  AttributesNode
-  (to-hiccup [this _]
-    [:markdown/attributes (into {} (for [attribute (.getChildren this)
-                                         :let [name (str (.getName attribute))
-                                               value (str (.getValue attribute))]]
-                                     (cond
-                                       (.isId attribute) [:id value]
-                                       (.isClass attribute) [:class value]
-                                       :else [(keyword name) (if (not-empty value) value true)])))])
   Footnote
   (to-hiccup [this _]
     [:markdown/footnote {:id (str (.getText this))}])

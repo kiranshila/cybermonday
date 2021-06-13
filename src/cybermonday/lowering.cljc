@@ -11,7 +11,6 @@
    :markdown/inline-math :code
    :markdown/html-comment nil
    :markdown/soft-line-break nil
-   :markdown/attributes nil
    :markdown/reference nil
    :markdown/table-separator nil})
 
@@ -77,6 +76,9 @@
    :li
    (conj body [:input {:checked checked? :disabled true :type "checkbox"}])))
 
+(defn lower-mustache [[_ _ body]]
+  (str "{{" body "}}"))
+
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
     (when-let [new-tag (default-tags tag)]
@@ -95,22 +97,8 @@
    :markdown/footnote-block lower-footnote-block
    :markdown/task-list-item lower-task-list-item
    :markdown/link-ref lower-link-ref
-   :markdown/image-ref lower-image-ref})
-
-(defn attributes
-  "Returns the attributes map of a given node, merging children attributes IR nodes"
-  [[_ attrs & body]]
-  (apply merge attrs (map second (filter #(= :markdown/attributes (first %)) body))))
-
-(defn merge-attributes
-  "Walks the IR tree and merges in attributes"
-  [ir]
-  (walk/postwalk
-   (fn [item]
-     (if (hiccup? item)
-       (assoc item 1 (attributes item))
-       item))
-   ir))
+   :markdown/image-ref lower-image-ref
+   :markdown/mustache lower-mustache})
 
 (defn lower-ir
   "Transforms the IR tree by lowering nodes to their HTML representation"
@@ -153,6 +141,6 @@
   `:lower-fns` supplies a mapping from IR keyword to lowering fn
   `default-attrs` supplies a mapping from HTML keyword to default node attributes"
   [ir & [{:keys [lower-fns default-attrs]}]]
-  (-> (merge-attributes ir)
+  (-> ir
       (lower-ir (or lower-fns default-lowering))
       (apply-post-attrs (or default-attrs {}))))

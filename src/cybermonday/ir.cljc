@@ -70,18 +70,6 @@
        item))
    almost-hiccup))
 
-;; Final IR postprocessing
-
-(defn cleanup-whitespace
-  "Removes excess whitespace from the resulting AST."
-  [hiccup]
-  (walk/postwalk
-   (fn [item]
-     (cond
-       (string? item) (when (not (str/blank? item)) item)
-       :else item))
-   hiccup))
-
 ;; IR Generation
 
 (defn md-to-ir
@@ -90,5 +78,4 @@
   [md]
   (let [document (.parse parser/parser md)]
     (->> (parser/to-hiccup document md)
-         process-inline-html
-         cleanup-whitespace)))
+         process-inline-html)))
