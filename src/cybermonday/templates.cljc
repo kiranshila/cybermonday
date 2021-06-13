@@ -4,7 +4,10 @@
    [clojure.walk :as walk]
    [clojure.string :as str]))
 
-(def blacklisted-tags #{:pre :code})
+(def blacklisted-tags #{:pre
+                        :code
+                        :markdown/indented-code-block
+                        :markdown/fenced-code-block})
 
 (defn parse-templates [ast]
   (walk/postwalk
@@ -26,7 +29,7 @@
                                [not-template [:markdown/mustache {} template]]
                                [not-template]))]
                      (mapcat process items)))
-                 child))))
+                 [child]))))
            item))
        item))
    ast))
