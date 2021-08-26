@@ -1,7 +1,6 @@
 (ns cybermonday.parser
   (:require
    [cybermonday.utils :refer [make-hiccup-node html-comment-re]]
-   ["remark" :as remark]
    ["unified" :as unified]
    ["remark-math" :as math]
    ["remark-parse" :as rp]
