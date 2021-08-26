@@ -47,6 +47,6 @@
   (walk/postwalk
    (fn [item]
      (cond
-       (string? item) (when (not (str/blank? item)) item)
+       (string? item) (when (seq item) item)
        :else item))
    hiccup))
