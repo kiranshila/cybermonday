@@ -4,13 +4,14 @@
    [cybermonday.templates :as templates]
    [cybermonday.lowering :as lowering]
    [cybermonday.ir :as ir]
-   #?(:clj [clj-yaml.core :as yaml]
+   #?(:cljs [cljs-bean.core :refer [->clj]])
+   #?(:clj  [clj-yaml.core :as yaml]
       :cljs ["yaml" :as yaml])))
 
 (def frontmatter-re #"(?ms)(?:^---$(.*)^---$)?(.*)")
 
 (def parse-yaml #?(:clj yaml/parse-string
-                   :cljs yaml/parse))
+                   :cljs (comp ->clj yaml/parse)))
 
 (defn parse-md
   "Generates HTML hiccup from markdown and associated frontmatter
