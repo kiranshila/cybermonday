@@ -24,7 +24,7 @@
   (let [[key value] (str/split attr #"=")]
     (hash-map (keyword key) (let [trimmed-value (str/trim value)]
                               (if (= \" (first trimmed-value))
-                                (subs trimmed-value 1 (dec (.length trimmed-value)))
+                                (subs trimmed-value 1 (dec (count trimmed-value)))
                                 trimmed-value)))))
 
 (defn parse-tag [tag]
