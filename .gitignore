@@ -4,6 +4,7 @@
 *.jar
 *.class
 .lsp/
+yarn-error.log
 /.cpcache
 /.lein-*
 /.nrepl-history
