@@ -9,7 +9,9 @@
   "Create thinjar"
   [opts]
   (-> opts
-      (assoc :lib lib :version version)
+      (assoc :lib lib
+             :version version
+             :scm-url "https://github.com/kiranshila/cybermonday")
       (bb/clean)
       (bb/jar)))
 
