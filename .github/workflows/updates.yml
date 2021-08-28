@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: Checkout Latest Commit
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Check deps
         uses: nnichols/clojure-dependency-update-action@v3
