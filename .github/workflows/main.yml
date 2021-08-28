@@ -23,5 +23,8 @@ jobs:
         shell: bash
 
       - name: Push to Clojars
+        env:
+          CLOJARS_PASSWORD: ${{ secrets.CLOJARS_PASSWORD }}
+          CLOJARS_USERNAME: ${{ secrets.CLOJARS_USERNAME }}
         run: clojure -T:build deploy
         shell: bash
