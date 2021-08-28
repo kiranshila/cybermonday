@@ -1,4 +1,5 @@
 {:paths ["src"]
+
  :deps {org.clojure/clojure {:mvn/version "1.10.3"}
         clj-commons/clj-yaml {:mvn/version "0.7.107"}
         com.vladsch.flexmark/flexmark {:mvn/version "0.62.2"}
@@ -13,11 +14,6 @@
         thheller/shadow-cljs {:mvn/version "2.15.5"}}
 
  :aliases
- {:jar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.216"}}
-        :exec-fn hf.depstar/jar
-        :exec-args {:jar "target/cybermonday.jar"}}
-  :deploy {:extra-deps {slipset/deps-deploy {:mvn/version "0.1.5"}}
-           :exec-fn deps-deploy.deps-deploy/deploy
-           :exec-args {:installer :remote
-                       :sign-releases? true
-                       :artifact "target/cybermonday.jar"}}}}
+ {:build {:extra-paths ["build"]
+          :deps {io.github.seancorfield/build-clj {:git/tag "v0.1.0" :git/sha "fe2d586"}}
+          :ns-default build}}}
