@@ -13,16 +13,30 @@
 (def parse-yaml #?(:clj yaml/parse-string
                    :cljs (comp ->clj yaml/parse)))
 
+(defn parse-front
+  "Parse only the frontmatter of a markdown file. "
+  [md]
+  (let [[_ fm body] (re-matches frontmatter-re md)]
+    (when fm (parse-yaml fm)))
+  )
+
+(defn parse-body
+  "Parse only the body of a markdown file."
+  ([md opts]
+   (let [[_ fm body] (re-matches frontmatter-re md)]
+     (cond-> body
+       true ir/md-to-ir
+       (:process-templates? opts) templates/parse-templates
+       true (lowering/to-html-hiccup opts)
+       true utils/cleanup-whitespace)))
+  ([md] (parse-md md nil)))
+
 (defn parse-md
   "Generates HTML hiccup from markdown and associated frontmatter
   See `cybermonday.lowering/to-html-hiccup` for opts map values.
   Set `:process-templates?` to true to process mustache templates"
   ([md opts]
-   (let [[_ fm body] (re-matches frontmatter-re md)]
-     {:frontmatter (when fm (parse-yaml fm))
-      :body (cond-> body
-              true ir/md-to-ir
-              (:process-templates? opts) templates/parse-templates
-              true (lowering/to-html-hiccup opts)
-              true utils/cleanup-whitespace)}))
+   {:frontmatter (parse-front md)
+    :body (parse-body md opts)})
   ([md] (parse-md md nil)))
+
