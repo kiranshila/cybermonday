@@ -29,7 +29,7 @@
        (:process-templates? opts) templates/parse-templates
        true (lowering/to-html-hiccup opts)
        true utils/cleanup-whitespace)))
-  ([md] (parse-md md nil)))
+  ([md] (parse-body md nil)))
 
 (defn parse-md
   "Generates HTML hiccup from markdown and associated frontmatter
