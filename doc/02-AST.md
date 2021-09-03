@@ -60,11 +60,10 @@ Please note that some of these are Flexmark specific and not available in remark
 
 ### Heading
 
-`:id` (potentially `nil`) is a string of the heading id.
 `:level` will take integer values 1-6.
 
 ```clojure
-[:markdown/heading {:level 1 :id "my-heading"} "Heading"]
+[:markdown/heading {:level 1} "Heading"]
 ```
 
 ### Fenced Code Block

@@ -89,17 +89,18 @@
   Heading
   (to-hiccup [this source]
     (make-hiccup-node :markdown/heading
-                      {:level (.getLevel this)
-                       :id (not-empty (.getAnchorRefId this))}
+                      {:level (.getLevel this)}
                       (map-children-to-hiccup this source)))
   FencedCodeBlock
   (to-hiccup [this source]
-    (make-hiccup-node :markdown/fenced-code-block
-                      {:language (str (.getInfo this))}
-                      (map-children-to-hiccup this source)))
+    [:markdown/fenced-code-block
+     {:language (let [lang (str (.getInfo this))]
+                  (when (seq lang)
+                    lang))}
+     (str/trimr (str (.getContentChars this)))])
   IndentedCodeBlock
   (to-hiccup [this _]
-    [:markdown/indented-code-block {} (str (.getContentChars this))])
+    [:markdown/indented-code-block {} (str/trimr (str (.getContentChars this)))])
   TableCell
   (to-hiccup [this source]
     (make-hiccup-node :markdown/table-cell
