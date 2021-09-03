@@ -26,8 +26,8 @@
      (cond-> body
        true ir/md-to-ir
        (:process-templates? opts) templates/parse-templates
-       true (lowering/to-html-hiccup opts)
-       true utils/cleanup)))
+       false (lowering/to-html-hiccup opts)
+       false utils/cleanup)))
   ([md] (parse-body md nil)))
 
 (defn parse-md
