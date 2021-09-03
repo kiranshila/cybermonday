@@ -31,5 +31,3 @@
 (deftest html
   (testing "Parsing to HTML"
     (is (= expected-html (cm/parse-body test-document)))))
-
-(cm/parse-body test-document)
