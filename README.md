@@ -3,6 +3,7 @@
 > What if markdown was _just data_
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kiranshila/cybermonday/Main)
+[![codecov](https://codecov.io/gh/kiranshila/cybermonday/branch/master/graph/badge.svg?token=U0130A9B8Y)](https://codecov.io/gh/kiranshila/cybermonday)
 [![Clojars Project](https://img.shields.io/clojars/v/com.kiranshila/cybermonday.svg)](https://clojars.org/com.kiranshila/cybermonday)
 [![cljdoc badge](https://cljdoc.org/badge/com.kiranshila/cybermonday)](https://cljdoc.org/d/com.kiranshila/cybermonday/CURRENT)
 
