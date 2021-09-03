@@ -1,4 +1,4 @@
-name: Tests
+name: CLJ Tests
 on:
   pull_request:
 jobs:
