@@ -1,0 +1,30 @@
+name: Tests
+on:
+  pull_request:
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Prepare java
+        uses: actions/setup-java@v2
+        with:
+          distribution: "adopt"
+          java-version: "11"
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@3.5
+        with:
+          cli: latest
+
+      - name: Run tests
+        run: clojure -M:test
+        shell: bash
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: junit.xml
