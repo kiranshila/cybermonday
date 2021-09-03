@@ -14,16 +14,15 @@
                    :cljs (comp ->clj yaml/parse)))
 
 (defn parse-front
-  "Parse only the frontmatter of a markdown file. "
+  "Parse only the frontmatter of a markdown file."
   [md]
-  (let [[_ fm body] (re-matches frontmatter-re md)]
-    (when fm (parse-yaml fm)))
-  )
+  (let [[_ fm _] (re-matches frontmatter-re md)]
+    (when fm (parse-yaml fm))))
 
 (defn parse-body
   "Parse only the body of a markdown file."
   ([md opts]
-   (let [[_ fm body] (re-matches frontmatter-re md)]
+   (let [[_ _ body] (re-matches frontmatter-re md)]
      (cond-> body
        true ir/md-to-ir
        (:process-templates? opts) templates/parse-templates
