@@ -58,7 +58,6 @@
    BulletList :ul
    BulletListItem :markdown/bullet-list-item
    OrderedListItem :markdown/ordered-list-item
-   TableSeparator :markdown/table-separator
    Code :code
    TableBlock :table
    TableHead :thead
@@ -180,6 +179,9 @@
      {:checked? (.isItemDoneMarker this)
       :ordered? (.isOrderedItem this)}
      (map-children-to-hiccup this source)))
+  TableSeparator
+  (to-hiccup [this _]
+    nil)
   nil
   (to-hiccup [this _]
     nil))

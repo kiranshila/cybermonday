@@ -178,14 +178,6 @@ GitHub-style lists of check boxes
 [:markdown/mail-link {:address "you@example.com"}]
 ```
 
-#### Table Separator
-
-Currently Java only
-
-```clojure
-[:markdown/table-separator]
-```
-
 #### Table Cell
 
 `:header?` is a boolean indicating whether this cell is a header.
