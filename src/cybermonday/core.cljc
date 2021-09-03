@@ -27,7 +27,7 @@
        true ir/md-to-ir
        (:process-templates? opts) templates/parse-templates
        true (lowering/to-html-hiccup opts)
-       true utils/cleanup-whitespace)))
+       true utils/cleanup)))
   ([md] (parse-body md nil)))
 
 (defn parse-md

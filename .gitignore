@@ -5,6 +5,7 @@
 *.class
 .lsp/
 yarn-error.log
+junit.xml
 /.cpcache
 /.lein-*
 /.nrepl-history

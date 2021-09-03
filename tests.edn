@@ -1,0 +1,9 @@
+#kaocha/v1
+ {:tests [{:id          :unit
+           :test-paths  ["test" "src"]
+           :ns-patterns [".*"]}]
+  :reporter kaocha.report.progress/report
+  :plugins [:kaocha.plugin/cloverage :kaocha.plugin/junit-xml]
+  :kaocha.plugin.junit-xml/target-file "junit.xml"
+  :cloverage/opts {:codecov? true
+                   :html? false}}

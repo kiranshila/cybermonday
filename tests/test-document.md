@@ -1,3 +1,0 @@
-# Cybermonday Test Document
-
-##

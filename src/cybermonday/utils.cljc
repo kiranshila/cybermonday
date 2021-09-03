@@ -41,12 +41,13 @@
 
 (def html-comment-re #"<!--([\s\S]*?)-->")
 
-(defn cleanup-whitespace
-  "Removes excess whitespace from the resulting AST."
+(defn cleanup
+  "Removes excess whitespace and nils from the resulting AST."
   [hiccup]
   (walk/postwalk
    (fn [item]
      (cond
        (string? item) (when (seq item) item)
+       (hiccup? item) (filterv (complement nil?) item)
        :else item))
    hiccup))
