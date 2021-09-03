@@ -11,8 +11,7 @@
    :markdown/inline-math :code
    :markdown/html-comment nil
    :markdown/soft-line-break nil
-   :markdown/reference nil
-   :markdown/table-separator nil})
+   :markdown/reference nil})
 
 (defn lower-heading [[_ attrs & body :as node]]
   (make-hiccup-node
