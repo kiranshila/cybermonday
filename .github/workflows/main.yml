@@ -2,7 +2,7 @@ name: Main
 on:
   push:
     branches:
-    - master
+      - master
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
           cli: latest
 
       - name: Run tests
-        run: clojure -M:test
+        run: clojure -M:test-clj
         shell: bash
 
       - name: Upload test results

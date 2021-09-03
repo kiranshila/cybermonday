@@ -15,5 +15,4 @@ junit.xml
 *.asc
 .shadow-cljs
 node_modules/*
-package.json
 yarn.lock

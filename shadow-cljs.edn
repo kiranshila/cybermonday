@@ -1,1 +1,3 @@
-{:deps true}
+{:deps true
+ :builds {:test {:target :karma
+                 :output-to "target/ci.js"}}}
