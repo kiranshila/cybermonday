@@ -1,5 +1,5 @@
 name: CLJS Tests
-on: [push, pull-requests]
+on: [push, pull_request]
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
