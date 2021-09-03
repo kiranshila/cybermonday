@@ -49,7 +49,7 @@
   {Paragraph :p
    Emphasis :em
    ThematicBreak :hr
-   HardLineBreak :markdown/hard-line-break
+   HardLineBreak :br
    SoftLineBreak :markdown/soft-line-break
    Document :div
    StrongEmphasis :strong

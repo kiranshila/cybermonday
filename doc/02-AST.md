@@ -46,12 +46,6 @@ Please note that some of these are Flexmark specific and not available in remark
 [:markdown/ordered-list-item {} "Item"]
 ```
 
-### Hard Line Break
-
-```clojure
-[:markdown/hard-line-break {}]
-```
-
 ### Soft Line Break
 
 ```clojure
