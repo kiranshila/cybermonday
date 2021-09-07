@@ -5,7 +5,7 @@
    [cybermonday.lowering :as lowering]
    [cybermonday.ir :as ir]
    #?(:cljs [cljs-bean.core :refer [->clj]])
-   #?(:clj  [clj-yaml.core :as yaml]
+   #?(:clj  [yaml.core :as yaml]
       :cljs ["yaml" :as yaml])))
 
 (def frontmatter-re #"(?ms)(?:^---$(.*)^---$)?(.*)")
