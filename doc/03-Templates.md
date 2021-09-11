@@ -1,22 +1,22 @@
 # Templates
 
-Cybermonday has very basic support for templates with
-[mustache](https://mustache.github.io/) syntax. This is basic in the sense that
-it only works for mustache tags, such as `{{foo}}` transforms to a
-`:markdown/mustache` IR node as `[:markdown/mustache {} "foo"]`. This feature is
-disabled by default but can be enabled by setting `:parse-templates?` to `true`
-in the `parse-md` opts map.
+Cybermonday pairs well with templating, but context is very important.
+Cybermonday itself doesn't provide any templating abilities, there are many
+excellent libraries out there for that such as
+[pogonos](https://github.com/athos/pogonos) for mustache.
 
-You could then easily implement templating with a lowering fn such as
+For example, mustache could be used in two ways:
+
+1. You could template the markdown itself, by passing the entire document
+   through pogonos
+2. You could walk the resulting AST, transforming strings where appropriate.
+
+The former has the use case of systematically creating markdown documents while
+the latter is more of templating small parts of the document.
+
+In the latter, you might want to blacklist some tags and only process text in
+certain places, this can easily be accomplished with:
 
 ```clojure
-(def replacements {:foo "bar"})
 
-(defn lower-mustache [[_ _ body]]
-  ((keyword body) replacements))
 ```
-
-However the default behavior, even when enabled is to leave the text as is.
-
-This feature should be considered very alpha and prone to change as we perhaps
-might want to pull in an actual implementation of mustache templating.
