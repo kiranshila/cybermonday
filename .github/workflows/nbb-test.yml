@@ -17,4 +17,4 @@ jobs:
           node-version: "16"
 
       - name: Run tests
-        run: npx nbb test/nbb_runner.cljs
+        run: npm install && npx nbb test/nbb_runner.cljs
