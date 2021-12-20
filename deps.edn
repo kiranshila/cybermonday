@@ -12,10 +12,11 @@
         com.vladsch.flexmark/flexmark-ext-gitlab {:mvn/version "0.62.2"}
         hickory/hickory {:mvn/version "0.7.1"}
         cljs-bean/cljs-bean {:mvn/version "1.7.0"}
-        thheller/shadow-cljs {:mvn/version "2.15.9"}}
+        }
 
  :aliases {:test-cljs {:extra-paths ["test"]
-                       :main-opts ["-m" "shadow.cljs.devtools.cli" "release" "test"]}
+                       :main-opts ["-m" "shadow.cljs.devtools.cli" "release" "test"]
+                        :extra-deps {thheller/shadow-cljs {:mvn/version "2.15.9"}}}
            :test-clj {:extra-paths ["test"]
                       :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.887"}
                                    lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}
