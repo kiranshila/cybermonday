@@ -7,7 +7,8 @@
         com.vladsch.flexmark/flexmark-ext-footnotes {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-ext-gfm-strikethrough {:mvn/version "0.62.2"}
         com.vladsch.flexmark/flexmark-ext-gfm-tasklist {:mvn/version "0.62.2"}
-        com.vladsch.flexmark/flexmark-test-util {:mvn/version "0.62.2"}
+        com.vladsch.flexmark/flexmark-test-util {:mvn/version "0.62.2"
+                                                 :exclusions [junit/junit]}
         com.vladsch.flexmark/flexmark-ext-gitlab {:mvn/version "0.62.2"}
         hickory/hickory {:mvn/version "0.7.1"}
         cljs-bean/cljs-bean {:mvn/version "1.7.0"}
