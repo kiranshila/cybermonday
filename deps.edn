@@ -17,7 +17,7 @@
 
  :aliases {:test-cljs {:extra-paths ["test"]
                        :main-opts ["-m" "shadow.cljs.devtools.cli" "release" "test"]
-                        :extra-deps {thheller/shadow-cljs {:mvn/version "2.15.9"}}}
+                        :extra-deps {thheller/shadow-cljs {:mvn/version "2.16.12"}}}
            :test-clj {:extra-paths ["test"]
                       :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.887"}
                                    lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}
