@@ -4,7 +4,7 @@
             [clojure.string :as str]))
 
 (def lib 'com.kiranshila/cybermonday)
-(def version (format "0.2.%s" (b/git-count-revs nil)))
+(def version (format "0.3.%s" (b/git-count-revs nil)))
 
 (defn sha
   [{:keys [dir path] :or {dir "."} :as params}]

@@ -2,11 +2,11 @@
   (:require
    [cybermonday.utils :refer [make-hiccup-node html-comment-re]]
    ["unified" :refer [unified]]
-   ["remark-math" :default math]
-   ["remark-parse" :default rp]
-   ["remark-footnotes" :default footnotes]
+   ["remark-math$default" :as math]
+   ["remark-parse$default" :as rp]
+   ["remark-footnotes$default" :as footnotes]
    ["html-entities" :as entities]
-   ["remark-gfm" :default gfm]
+   ["remark-gfm$default" :as gfm]
    [clojure.string :as str]))
 
 (def parser (.. (unified)

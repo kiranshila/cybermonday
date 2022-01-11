@@ -1,10 +1,10 @@
 (ns cybermonday.core
   (:require
    [cybermonday.utils :as utils]
-   [cybermonday.templates :as templates]
    [cybermonday.lowering :as lowering]
    [cybermonday.ir :as ir]
-   #?(:cljs [cljs-bean.core :refer [->clj]])
+   #?(:org.babashka/nbb [clojure.core :refer [js->clj] :rename {js->clj ->clj}]
+      :cljs [cljs-bean.core :refer [->clj]])
    #?(:clj  [yaml.core :as yaml]
       :cljs ["yaml" :as yaml])))
 
@@ -23,19 +23,16 @@
   "Parse only the body of a markdown file."
   ([md opts]
    (let [[_ _ body] (re-matches frontmatter-re md)]
-     (cond-> body
-       true ir/md-to-ir
-       (:process-templates? opts) templates/parse-templates
-       true (lowering/to-html-hiccup opts)
-       true utils/cleanup)))
+     (-> body
+         ir/md-to-ir
+         (lowering/to-html-hiccup opts)
+         utils/cleanup)))
   ([md] (parse-body md nil)))
 
 (defn parse-md
   "Generates HTML hiccup from markdown and associated frontmatter
-  See `cybermonday.lowering/to-html-hiccup` for opts map values.
-  Set `:process-templates?` to true to process mustache templates"
+  See `cybermonday.lowering/to-html-hiccup` for opts map values. "
   ([md opts]
    {:frontmatter (parse-front md)
     :body (parse-body md opts)})
   ([md] (parse-md md nil)))
-
