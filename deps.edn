@@ -16,12 +16,12 @@
 
  :aliases {:test-cljs {:extra-paths ["test"]
                        :extra-deps {thheller/shadow-cljs {:mvn/version "2.16.12"}}
-                       :main-opts ["-m" "shadow.cljs.devtools.cli" "release" "test"]}}
- :test-clj {:extra-paths ["test"]
-            :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.887"}
-                         lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}
-                         lambdaisland/kaocha-cloverage {:mvn/version "1.0.75"}}
-            :main-opts ["-m" "kaocha.runner"]}
+                       :main-opts ["-m" "shadow.cljs.devtools.cli" "release" "test"]}
+           :test-clj {:extra-paths ["test"]
+                      :extra-deps {lambdaisland/kaocha {:mvn/version "1.0.887"}
+                                   lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}
+                                   lambdaisland/kaocha-cloverage {:mvn/version "1.0.75"}}
+                      :main-opts ["-m" "kaocha.runner"]}}
  :build {:extra-paths ["build"]
          :deps {io.github.seancorfield/build-clj {:git/url "https://github.com/kiranshila/build-clj" :git/sha "a4e03bc9e4ed78087120c4e7b10152cff1a4837b"}}
          :ns-default build}}
