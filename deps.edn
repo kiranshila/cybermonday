@@ -12,17 +12,16 @@
                                                  :exclusions [junit/junit]}
         com.vladsch.flexmark/flexmark-ext-gitlab {:mvn/version "0.62.2"}
         hickory/hickory {:mvn/version "0.7.1"}
-        cljs-bean/cljs-bean {:mvn/version "1.7.0"}
-        }
+        cljs-bean/cljs-bean {:mvn/version "1.8.0"}}
 
  :aliases {:test-cljs {:extra-paths ["test"]
-                       :main-opts ["-m" "shadow.cljs.devtools.cli" "release" "test"]
-                        :extra-deps {thheller/shadow-cljs {:mvn/version "2.15.9"}}}
+                       :extra-deps {thheller/shadow-cljs {:mvn/version "2.16.12"}}
+                       :main-opts ["-m" "shadow.cljs.devtools.cli" "release" "test"]}
            :test-clj {:extra-paths ["test"]
                       :extra-deps {lambdaisland/kaocha {:mvn/version "1.60.977"}
                                    lambdaisland/kaocha-junit-xml {:mvn/version "0.0.76"}
                                    lambdaisland/kaocha-cloverage {:mvn/version "1.0.75"}}
                       :main-opts ["-m" "kaocha.runner"]}
            :build {:extra-paths ["build"]
-                   :deps {io.github.seancorfield/build-clj {:git/url "https://github.com/kiranshila/build-clj" :git/sha "a4e03bc9e4ed78087120c4e7b10152cff1a4837b"}}
+                   :deps {io.github.seancorfield/build-clj {:git/tag "v0.6.7" :git/sha "22c2d09"}}
                    :ns-default build}}}

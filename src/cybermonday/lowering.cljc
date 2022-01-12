@@ -75,9 +75,6 @@
    :li
    (conj body [:input {:checked checked? :disabled true :type "checkbox"}])))
 
-(defn lower-mustache [[_ _ body]]
-  (str "{{" body "}}"))
-
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
     (when-let [new-tag (default-tags tag)]
@@ -96,8 +93,7 @@
    :markdown/footnote-block lower-footnote-block
    :markdown/task-list-item lower-task-list-item
    :markdown/link-ref lower-link-ref
-   :markdown/image-ref lower-image-ref
-   :markdown/mustache lower-mustache})
+   :markdown/image-ref lower-image-ref})
 
 (defn lower-ir
   "Transforms the IR tree by lowering nodes to their HTML representation"

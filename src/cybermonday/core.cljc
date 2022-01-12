@@ -3,7 +3,8 @@
    [cybermonday.utils :as utils]
    [cybermonday.lowering :as lowering]
    [cybermonday.ir :as ir]
-   #?(:cljs [cljs-bean.core :refer [->clj]])
+   #?(:org.babashka/nbb [clojure.core :refer [js->clj] :rename {js->clj ->clj}]
+      :cljs [cljs-bean.core :refer [->clj]])
    #?(:clj  [yaml.core :as yaml]
       :cljs ["yaml" :as yaml])))
 

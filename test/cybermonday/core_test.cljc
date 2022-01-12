@@ -1,9 +1,8 @@
 (ns cybermonday.core-test
   (:require
+   [clojure.test :as t]
    [cybermonday.core :as cm]
-   [cybermonday.ir :as ir]
-   #?(:clj [clojure.test :as t]
-      :cljs [cljs.test :as t :include-macros true])))
+   [cybermonday.ir :as ir]))
 
 (t/deftest ir
   (t/testing "Parsing to IR"

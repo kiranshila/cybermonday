@@ -16,3 +16,6 @@ junit.xml
 .shadow-cljs
 node_modules/*
 yarn.lock
+
+# clj-kondo and lsp
+.cache

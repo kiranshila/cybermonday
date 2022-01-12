@@ -3,11 +3,13 @@
             [org.corfield.build :as bb]
             [clojure.string :as str]))
 
+(def scm-url "git@github.com:kiranshila/cybermonday.git")
+
 (def lib 'com.kiranshila/cybermonday)
-(def version (format "0.3.%s" (b/git-count-revs nil)))
+(def version (format "0.4.%s" (b/git-count-revs nil)))
 
 (defn sha
-  [{:keys [dir path] :or {dir "."} :as params}]
+  [{:keys [dir path] :or {dir "."}}]
   (-> {:command-args (cond-> ["git" "rev-parse" "HEAD"]
                        path (conj "--" path))
        :dir (.getPath (b/resolve-path dir))
@@ -22,8 +24,10 @@
   (-> opts
       (assoc :lib lib
              :version version
-             :tag (sha nil)
-             :scm-url "https://github.com/kiranshila/cybermonday")
+             :scm {:tag (sha nil)
+                   :connection (str "scm:git:" scm-url)
+                   :developerConnection (str "scm:git:" scm-url)
+                   :url scm-url})
       (bb/clean)
       (bb/jar)))
 
