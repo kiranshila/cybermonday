@@ -83,7 +83,7 @@ Another breaking example is if the attributes of a tag contain `=` in the value 
 
 ## License
 
-Copyright © 2021 Kiran Shila
+Copyright © 2022 Kiran Shila
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
