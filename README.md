@@ -81,6 +81,9 @@ The inline html parser is really rudimentary. Please be gentle. They pretty much
 
 Another breaking example is if the attributes of a tag contain `=` in the value of the attribute. I'm splitting the attributes up by the `=`, so any random `=` that doesn't separate the key and the value will break the parser.
 
+## JVM Compat
+Flexmark now has a hard dependency on Java 11 - for which is carried over here. If you need Java 8, pin the flexmark deps to 0.62.2
+
 ## License
 
 Copyright © 2022 Kiran Shila
