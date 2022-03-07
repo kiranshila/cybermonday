@@ -3,14 +3,14 @@
  :deps {org.clojure/clojure {:mvn/version "1.10.3"}
         io.forward/yaml {:mvn/version "1.0.11"}
         org.yaml/snakeyaml {:mvn/version "1.30"} ;; bump transitive dep of io.forward/yaml to avoid CVE-2017-18640
-        com.vladsch.flexmark/flexmark {:mvn/version "0.62.2"}
-        com.vladsch.flexmark/flexmark-ext-tables {:mvn/version "0.62.2"}
-        com.vladsch.flexmark/flexmark-ext-footnotes {:mvn/version "0.62.2"}
-        com.vladsch.flexmark/flexmark-ext-gfm-strikethrough {:mvn/version "0.62.2"}
-        com.vladsch.flexmark/flexmark-ext-gfm-tasklist {:mvn/version "0.62.2"}
-        com.vladsch.flexmark/flexmark-test-util {:mvn/version "0.62.2"
+        com.vladsch.flexmark/flexmark {:mvn/version "0.64.0"}
+        com.vladsch.flexmark/flexmark-ext-tables {:mvn/version "0.64.0"}
+        com.vladsch.flexmark/flexmark-ext-footnotes {:mvn/version "0.64.0"}
+        com.vladsch.flexmark/flexmark-ext-gfm-strikethrough {:mvn/version "0.64.0"}
+        com.vladsch.flexmark/flexmark-ext-gfm-tasklist {:mvn/version "0.64.0"}
+        com.vladsch.flexmark/flexmark-test-util {:mvn/version "0.64.0"
                                                  :exclusions [junit/junit]}
-        com.vladsch.flexmark/flexmark-ext-gitlab {:mvn/version "0.62.2"}
+        com.vladsch.flexmark/flexmark-ext-gitlab {:mvn/version "0.64.0"}
         hickory/hickory {:mvn/version "0.7.1"}
 
         ;; Fix for jsoup CVE-2021-37714. Jsoup is a transitive dep of
@@ -30,5 +30,5 @@
                                    lambdaisland/kaocha-cloverage {:mvn/version "1.0.75"}}
                       :main-opts ["-m" "kaocha.runner"]}
            :build {:extra-paths ["build"]
-                   :deps {io.github.seancorfield/build-clj {:git/tag "v0.6.7" :git/sha "22c2d09"}}
+                   :deps {io.github.seancorfield/build-clj {:git/tag "v0.8.0" :git/sha "22c2d09"}}
                    :ns-default build}}}
