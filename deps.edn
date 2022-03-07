@@ -30,5 +30,5 @@
                                    lambdaisland/kaocha-cloverage {:mvn/version "1.0.75"}}
                       :main-opts ["-m" "kaocha.runner"]}
            :build {:extra-paths ["build"]
-                   :deps {io.github.seancorfield/build-clj {:git/tag "v0.6.7" :git/sha "22c2d09"}}
+                   :deps {io.github.seancorfield/build-clj {:git/tag "v0.8.0" :git/sha "22c2d09"}}
                    :ns-default build}}}
