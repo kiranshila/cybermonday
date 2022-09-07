@@ -1,7 +1,9 @@
 (ns cybermonday.lowering
   (:require
    [cybermonday.utils :refer [hiccup? make-hiccup-node gen-id]]
-   [clojure.walk :as walk]))
+   [clojure.string :as str]
+   [clojure.walk :as walk])
+  #?(:clj (:import java.lang.Integer)))
 
 (def default-tags
   "Deafult mappings from IR tags to HTML tags where transformation isn't required"
@@ -79,6 +81,69 @@
                (drop 2 (first body))
                body)))
 
+(defn lower-toc [[_ {:keys [style]}] full-ir]
+  (letfn [(get-levels-from-style
+            ;; Returns a set of valid integer levels from the style attribute or
+            ;; nil if level list is malformed
+            ;; See https://github.com/vsch/flexmark-java/wiki/Table-of-Contents-Extension#syntax
+            [style]
+            (try
+              (let [levels-string (->> style (re-find #"levels=(\S*)") second)
+                    levels-list (->> (str/split levels-string #",")
+                                     (map #(str/split % #"-"))
+                                     (map (fn [x] (map #?(:clj #(Integer/parseInt %)
+                                                          :cljs #(js/parseInt %)) x))))]
+                (reduce (fn [acc item]
+                          (cond
+                           (= 1 (count item)) (conj acc (first item))
+                           (= 2 (count item)) (apply conj acc (range (first item)
+                                                                     (+ 1 (second item))))
+                           :else (reduced nil)))
+                        #{}
+                        levels-list))
+              (catch #?(:clj Throwable :cljs :default) _ nil)))
+          (find-correct-insert-path
+            ;; Determine the key path to use as update-in argument in order to
+            ;; insert a heading into the correct place in the heading tree
+            [insert-level heading-tree]
+            ;; If tree is empty or last heading in tree is less significant, return nil to
+            ;; communicate that the heading should simply be conjed onto the end of tree
+            (when (and (seq heading-tree) (-> heading-tree first :level (< insert-level)))
+              ;; Start looking for a place to add the heading at the last top-level heading
+              (loop [heading-path [(- (count heading-tree) 1)]]
+                (let [{:keys [level children] :as heading} (get-in heading-tree heading-path)
+                      node-children-count (count children)]
+                  ;; If this heading is non-existent or less significant than the new heading,
+                  ;; append the new heading to the children vector containing this heading
+                  (if (or (not heading) (< insert-level level)) (pop heading-path)
+                    ;; Else look at the last top-level heading in this heading's children next
+                    (recur (conj heading-path :children (- node-children-count 1))))))))
+          (heading->hiccup [{:keys [children title id]}]
+            [:li [:a {:href (str "#" id)} title]
+             (when children (into [:ul] children))])]
+    (let [toc-levels (or (get-levels-from-style style) #{1 2 3 4 5 6})]
+      (->> full-ir
+           (filter (fn find-headings [ir-node]
+                     (and (vector? ir-node)
+                          (= :markdown/heading (first ir-node))
+                          (contains? toc-levels (-> ir-node second :level)))))
+           ;; Create tree of map nodes with :children keys instead of vector
+           ;; nodes to make insertion a bit easier
+           (map (fn prepare-headings-tree [[_tag attr title :as heading]]
+                  (assoc attr :title title :id (gen-id heading) :children [])))
+           (reduce (fn create-headings-tree [tree {:keys [level] :as heading}]
+                     (if-let [insert-path (find-correct-insert-path level tree)]
+                       (update-in tree insert-path #(conj % heading))
+                       (conj tree heading)))
+                   [])
+           ;; Turn all the headings into Hiccup, starting with leaf nodes
+           (walk/postwalk
+            (fn [node]
+              (if (:children node)
+                (heading->hiccup node)
+                node)))
+           (into [:ul {:class "table-of-contents"}])))))
+
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
     (when-let [new-tag (default-tags tag)]
@@ -99,7 +164,8 @@
    :markdown/link-ref lower-link-ref
    :markdown/image-ref lower-image-ref
    :markdown/bullet-list-item lower-list-item
-   :markdown/ordered-list-item lower-list-item})
+   :markdown/ordered-list-item lower-list-item
+   :markdown/table-of-contents lower-toc})
 
 (defn lower-ir
   "Transforms the IR tree by lowering nodes to their HTML representation"
@@ -110,7 +176,9 @@
         (if (hiccup? item)
           (let [tag (first item)]
             (if-let [transform-fn (tag final-map)]
-              (transform-fn item)
+              (if (= :markdown/table-of-contents tag)
+                (transform-fn item ir)
+                (transform-fn item))
               (if (contains? default-tags tag)
                 (lower-fallback item)
                 item)))

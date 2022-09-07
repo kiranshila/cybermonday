@@ -19,14 +19,16 @@
    (com.vladsch.flexmark.ext.gfm.strikethrough StrikethroughExtension Strikethrough)
    (com.vladsch.flexmark.ext.gfm.tasklist TaskListExtension TaskListItem)
    (com.vladsch.flexmark.test.util AstCollectingVisitor)
-   (com.vladsch.flexmark.ext.gitlab GitLabExtension GitLabInlineMath)))
+   (com.vladsch.flexmark.ext.gitlab GitLabExtension GitLabInlineMath)
+   (com.vladsch.flexmark.ext.toc TocExtension TocBlock)))
 
 (def options
   "The default options for the Flexmark parser
   There shouldn't be a reason to change this"
   (.. (MutableDataSet.)
       (set Parser/EXTENSIONS
-           [(TablesExtension/create)
+           [(TocExtension/create)
+            (TablesExtension/create)
             (FootnoteExtension/create)
             (StrikethroughExtension/create)
             (TaskListExtension/create)
@@ -183,6 +185,9 @@
   TableSeparator
   (to-hiccup [this _]
     nil)
+  TocBlock
+  (to-hiccup [this _]
+    [:markdown/table-of-contents {:style (str (.getStyle this))}])
   nil
   (to-hiccup [this _]
     nil))

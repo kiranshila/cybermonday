@@ -108,7 +108,10 @@
                   [:markdown/reference {:label "foo *bar*"
                                         :title "train & tracks"
                                         :url "train.jpg"}]]
-                 (ir/md-to-ir "![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\""))))))
+                 (ir/md-to-ir "![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\""))))
+    #?(:clj (t/testing "Table of Contents"
+              (t/is (= [:div {} [:markdown/table-of-contents {:style ""}]] (ir/md-to-ir "[TOC]")))
+              (t/is (= [:div {} [:markdown/table-of-contents {:style "levels=1-3"}]] (ir/md-to-ir "[TOC levels=1-3]")))))))
 
 (t/deftest html-lowering
   (t/testing "Parsing to HTML"
