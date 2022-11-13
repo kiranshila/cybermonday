@@ -1,6 +1,6 @@
 {:paths ["src"]
 
- :deps {org.clojure/clojure {:mvn/version "1.10.3"}
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
         io.forward/yaml {:mvn/version "1.0.11"}
         org.yaml/snakeyaml {:mvn/version "1.30"} ;; bump transitive dep of io.forward/yaml to avoid CVE-2017-18640
         com.vladsch.flexmark/flexmark {:mvn/version "0.64.0"}
