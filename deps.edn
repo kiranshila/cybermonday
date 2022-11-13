@@ -16,7 +16,7 @@
         ;; Fix for jsoup CVE-2021-37714. Jsoup is a transitive dep of
         ;; hickory. If hickory bumps its version we can remove the dep
         ;; here.
-        org.jsoup/jsoup {:mvn/version "1.14.3"}
+        org.jsoup/jsoup {:mvn/version "1.15.3"}
 
         cljs-bean/cljs-bean {:mvn/version "1.8.0"}
         }
