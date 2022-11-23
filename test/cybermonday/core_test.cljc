@@ -25,7 +25,6 @@
                              [:p {} "foo\nbar\nbaz"]]]]]
                  (ir/md-to-ir ">>> foo\n> bar\n>>baz"))))
     (t/testing "List Items"
-
       (t/is (= [:div {} [:ol {}
                          [:markdown/ordered-list-item {} [:p {} "One"]]
                          [:markdown/ordered-list-item {} [:p {} "Two"]]
@@ -110,3 +109,36 @@
                                         :title "train & tracks"
                                         :url "train.jpg"}]]
                  (ir/md-to-ir "![foo *bar*][]\n\n[foo *bar*]: train.jpg \"train & tracks\""))))))
+
+(t/deftest html-lowering
+  (t/testing "Parsing to HTML"
+    ; TODO - Run all the commonmark tests
+    (t/testing "List Items"
+      (t/is (= [:div {}
+                [:p {} "A paragraph" "with two lines."]
+                [:pre {} [:code {} "indented code"]]
+                [:blockquote {} [:p {} "A block quote."]]]
+               (cm/parse-body "A paragraph\nwith two lines.\n\n    indented code\n\n> A block quote.")))
+      (t/is (= [:div {}
+                [:ol {}
+                 [:li {}
+                  [:p {} "A paragraph" "with two lines."]
+                  [:pre {} [:code {} "indented code"]]
+                  [:blockquote {} [:p {} "A block quote."]]]]]
+               (cm/parse-body "1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.")))
+      (t/is (= [:div {}
+                [:ul {}
+                 [:li {} "one"]]
+                [:p {} "two"]]
+               (cm/parse-body "- one\n\n two")))
+      (t/is (= [:div {}
+                [:ul {}
+                 [:li {}
+                  [:p {} "one"]
+                  [:p {} "two"]]]]
+               (cm/parse-body "- one\n\n  two")))
+      (t/is (= [:div {}
+                [:ul {}
+                 [:li {}
+                  [:code {} "foo"]]]]
+               (cm/parse-body "- `foo`"))))))

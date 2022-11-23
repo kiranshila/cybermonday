@@ -5,9 +5,7 @@
 
 (def default-tags
   "Deafult mappings from IR tags to HTML tags where transformation isn't required"
-  {:markdown/bullet-list-item :li
-   :markdown/ordered-list-item :li
-   :markdown/hard-line-break :br
+  {:markdown/hard-line-break :br
    :markdown/inline-math :code
    :markdown/html-comment nil
    :markdown/soft-line-break nil
@@ -75,6 +73,12 @@
    :li
    (conj body [:input {:checked checked? :disabled true :type "checkbox"}])))
 
+(defn lower-list-item [[_ attrs & body]]
+  (make-hiccup-node
+   :li attrs (if (= 1 (count body))
+               (drop 2 (first body))
+               body)))
+
 (defn lower-fallback [[tag attrs & body]]
   (if (contains? default-tags tag)
     (when-let [new-tag (default-tags tag)]
@@ -93,7 +97,9 @@
    :markdown/footnote-block lower-footnote-block
    :markdown/task-list-item lower-task-list-item
    :markdown/link-ref lower-link-ref
-   :markdown/image-ref lower-image-ref})
+   :markdown/image-ref lower-image-ref
+   :markdown/bullet-list-item lower-list-item
+   :markdown/ordered-list-item lower-list-item})
 
 (defn lower-ir
   "Transforms the IR tree by lowering nodes to their HTML representation"

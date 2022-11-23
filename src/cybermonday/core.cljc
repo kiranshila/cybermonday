@@ -31,7 +31,7 @@
 
 (defn parse-md
   "Generates HTML hiccup from markdown and associated frontmatter
-  See `cybermonday.lowering/to-html-hiccup` for opts map values. "
+  See `cybermonday.lowering/to-html-hiccup` for opts map values."
   ([md opts]
    {:frontmatter (parse-front md)
     :body (parse-body md opts)})
