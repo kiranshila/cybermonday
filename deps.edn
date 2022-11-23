@@ -18,7 +18,7 @@
         ;; here.
         org.jsoup/jsoup {:mvn/version "1.14.3"}
 
-        cljs-bean/cljs-bean {:mvn/version "1.8.0"}
+        cljs-bean/cljs-bean {:mvn/version "1.9.0"}
         }
 
  :aliases {:test-cljs {:extra-paths ["test"]
