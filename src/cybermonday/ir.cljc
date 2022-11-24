@@ -1,7 +1,7 @@
 (ns cybermonday.ir
   (:require
    [cybermonday.parser :as parser]
-   [cybermonday.utils :refer [hiccup?]]
+   [cybermonday.utils :refer [hiccup? update-stack-top]]
    [clojure.string :as str]
    [clojure.walk :as walk]))
 
@@ -37,25 +37,32 @@
 
 (defn fold-inline-html [xf]
   (let [state (volatile! [])]
-    (completing
-     (fn [r input]
+    (fn
+      ([] (xf))
+      ([r] (xf r))
+      ([r input]
        (cond
+           ;; Open tag
          (and (vector? input)
-              (some open-tag? input)) (do
-                                        (vswap! state conj (parse-tag (get input 2))) ; [:markdown/html {} "tag"]
-                                        r)
+              (some open-tag? input))
+         (do
+           (vswap! state conj (parse-tag (get input 2))) ; [:markdown/html {} "tag"]
+           r)
+           ;; Close tag
          (and (vector? input)
-              (some close-tag? input)) (let [thing (peek @state)]
-                                         (vswap! state pop)
-                                         (if (empty? @state)
-                                           (xf r thing)
-                                           (do
-                                             (vswap! state update (dec (count @state)) conj thing)
-                                             r)))
+              (some close-tag? input))
+         (let [thing (peek @state)]
+           (vswap! state pop)
+           (if (empty? @state)
+             (xf r thing)
+             (do
+               (vswap! state update-stack-top conj thing)
+               r)))
+           ;; Everything else
          :else (if (empty? @state)
                  (xf r input)
                  (do
-                   (vswap! state update (dec (count @state)) conj input)
+                   (vswap! state update-stack-top conj input)
                    r)))))))
 
 (defn process-inline-html

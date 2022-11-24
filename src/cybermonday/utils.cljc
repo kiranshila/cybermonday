@@ -2,6 +2,11 @@
   (:require [clojure.walk :as walk]
             [clojure.string :as str]))
 
+(defn update-stack-top
+  "Update the last element in v with (f (peek v))"
+  [v f & rest]
+  (conj (pop v) (apply f (peek v) rest)))
+
 (defn make-hiccup-node
   "Creates a hiccup node, consuming a sequence of children"
   ([tag children]
