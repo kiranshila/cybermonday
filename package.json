@@ -4,7 +4,7 @@
     "karma-chrome-launcher": "^3.1.1",
     "karma-cljs-test": "^0.1.0",
     "shadow-cljs": "^2.20.12",
-    "nbb": "1.1.149"
+    "nbb": "1.1.148"
   },
   "dependencies": {
     "html-entities": "^2.3.3",
