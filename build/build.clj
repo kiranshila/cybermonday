@@ -6,7 +6,7 @@
 (def scm-url "git@github.com:kiranshila/cybermonday.git")
 
 (def lib 'com.kiranshila/cybermonday)
-(def version (format "0.4.%s" (b/git-count-revs nil)))
+(def version (format "0.5.%s" (b/git-count-revs nil)))
 
 (defn sha
   [{:keys [dir path] :or {dir "."}}]
