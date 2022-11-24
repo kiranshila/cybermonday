@@ -1,4 +1,4 @@
-{:npm-deps {"html-entities" "2.3.2"
+{:npm-deps {"html-entities" "2.3.3"
             "remark" "14.0.2"
             "remark-footnotes" "4.0.1"
             "remark-gfm" "3.0.1"
