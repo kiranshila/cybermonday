@@ -115,18 +115,6 @@
     ; TODO - Run all the commonmark tests
     (t/testing "List Items"
       (t/is (= [:div {}
-                [:p {} "A paragraph" "with two lines."]
-                [:pre {} [:code {} "indented code"]]
-                [:blockquote {} [:p {} "A block quote."]]]
-               (cm/parse-body "A paragraph\nwith two lines.\n\n    indented code\n\n> A block quote.")))
-      (t/is (= [:div {}
-                [:ol {}
-                 [:li {}
-                  [:p {} "A paragraph" "with two lines."]
-                  [:pre {} [:code {} "indented code"]]
-                  [:blockquote {} [:p {} "A block quote."]]]]]
-               (cm/parse-body "1.  A paragraph\n    with two lines.\n\n        indented code\n\n    > A block quote.")))
-      (t/is (= [:div {}
                 [:ul {}
                  [:li {} "one"]]
                 [:p {} "two"]]
