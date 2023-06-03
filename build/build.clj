@@ -1,12 +1,19 @@
 (ns build
   (:require [clojure.tools.build.api :as b]
-            [org.corfield.build :as bb]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [deps-deploy.deps-deploy :as d]))
 
 (def scm-url "git@github.com:kiranshila/cybermonday.git")
-
 (def lib 'com.kiranshila/cybermonday)
 (def version (format "0.5.%s" (b/git-count-revs nil)))
+(def class-dir "target/classes")
+(def basis (b/create-basis {:project "deps.edn"}))
+(def jar-file (format "target/%s-%s.jar" (name lib) version))
+
+(defn clean
+  "Clean the build dir"
+  [_]
+  (b/delete {:path "target"}))
 
 (defn sha
   [{:keys [dir path] :or {dir "."}}]
@@ -19,21 +26,27 @@
       str/trim))
 
 (defn thinjar
-  "Create thinjar"
-  [opts]
-  (-> opts
-      (assoc :lib lib
-             :version version
-             :scm {:tag (sha nil)
-                   :connection (str "scm:git:" scm-url)
-                   :developerConnection (str "scm:git:" scm-url)
-                   :url scm-url})
-      (bb/clean)
-      (bb/jar)))
+  "Build the thinjar"
+  [_]
+  (b/write-pom {:class-dir class-dir
+                :lib lib
+                :version version
+                :basis basis
+                :scm {:tag (sha nil)
+                      :connection (str "scm:git:" scm-url)
+                      :developerConnection (str "scm:git:" scm-url)
+                      :url scm-url}
+                :src-dirs ["src"]})
+  (b/copy-dir {:src-dirs ["src" "resources"]
+               :target-dir class-dir})
+  (b/jar {:class-dir class-dir
+          :jar-file jar-file}))
 
 (defn deploy
   "Send to Clojars"
-  [opts]
-  (-> opts
-      (assoc :lib lib :version version)
-      (bb/deploy)))
+  [_]
+  (d/deploy {:lib lib
+             :version version
+             :installer :remote
+             :artifact (b/resolve-path jar-file)
+             :pom-file (b/pom-path {:lib lib :class-dir class-dir})}))

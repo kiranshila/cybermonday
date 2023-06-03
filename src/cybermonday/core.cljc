@@ -5,7 +5,7 @@
    [cybermonday.ir :as ir]
    #?(:org.babashka/nbb [clojure.core :refer [js->clj] :rename {js->clj ->clj}]
       :cljs [cljs-bean.core :refer [->clj]])
-   #?(:clj  [yaml.core :as yaml]
+   #?(:clj  [clj-yaml.core :as yaml]
       :cljs ["yaml" :as yaml])))
 
 (def frontmatter-re #"(?ms)(?:^---$(.*)^---$)?(.*)")
