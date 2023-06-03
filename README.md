@@ -2,7 +2,7 @@
 
 > What if markdown was _just data_
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kiranshila/cybermonday/Main)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kiranshila/cybermonday/main.yml?branch=master)
 [![codecov](https://codecov.io/gh/kiranshila/cybermonday/branch/master/graph/badge.svg?token=U0130A9B8Y)](https://codecov.io/gh/kiranshila/cybermonday)
 [![Clojars Project](https://img.shields.io/clojars/v/com.kiranshila/cybermonday.svg)](https://clojars.org/com.kiranshila/cybermonday)
 [![cljdoc badge](https://cljdoc.org/badge/com.kiranshila/cybermonday)](https://cljdoc.org/d/com.kiranshila/cybermonday/CURRENT)
@@ -82,6 +82,7 @@ The inline html parser is really rudimentary. Please be gentle. They pretty much
 Another breaking example is if the attributes of a tag contain `=` in the value of the attribute. I'm splitting the attributes up by the `=`, so any random `=` that doesn't separate the key and the value will break the parser.
 
 ## JVM Compat
+
 Flexmark now has a hard dependency on Java 11 - for which is carried over here. If you need Java 8, pin the flexmark deps to 0.62.2
 
 ## License
