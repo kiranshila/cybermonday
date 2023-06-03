@@ -4,7 +4,7 @@
         io.forward/yaml {:mvn/version "1.0.11"}
         org.yaml/snakeyaml {:mvn/version "1.33"} ;; bump transitive dep of io.forward/yaml to avoid CVE-2017-18640
         com.vladsch.flexmark/flexmark {:mvn/version "0.64.0"}
-        com.vladsch.flexmark/flexmark-ext-tables {:mvn/version "0.64.0"}
+        com.vladsch.flexmark/flexmark-ext-tables {:mvn/version "0.64.8"}
         com.vladsch.flexmark/flexmark-ext-footnotes {:mvn/version "0.64.0"}
         com.vladsch.flexmark/flexmark-ext-gfm-strikethrough {:mvn/version "0.64.0"}
         com.vladsch.flexmark/flexmark-ext-gfm-tasklist {:mvn/version "0.64.0"}
