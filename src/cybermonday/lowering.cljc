@@ -5,6 +5,8 @@
    [clojure.walk :as walk])
   #?(:clj (:import java.lang.Integer)))
 
+#?(:clj (set! *warn-on-reflection* true))
+
 (def default-tags
   "Deafult mappings from IR tags to HTML tags where transformation isn't required"
   {:markdown/hard-line-break :br

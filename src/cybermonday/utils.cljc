@@ -2,6 +2,8 @@
   (:require [clojure.walk :as walk]
             [clojure.string :as str]))
 
+#?(:clj (set! *warn-on-reflection* true))
+
 (defn update-stack-top
   "Update the last element in v with (f (peek v))"
   [v f & rest]

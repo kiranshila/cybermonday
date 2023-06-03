@@ -4,6 +4,7 @@
    [hickory.core :as h]
    [clojure.string :as str])
   (:import
+   (java.io Reader)
    (com.vladsch.flexmark.util.ast Node Document)
    (com.vladsch.flexmark.parser Parser)
    (com.vladsch.flexmark.util.data MutableDataSet)
@@ -22,6 +23,8 @@
    (com.vladsch.flexmark.ext.gitlab GitLabExtension GitLabInlineMath)
    (com.vladsch.flexmark.ext.toc TocExtension TocBlock)))
 
+(set! *warn-on-reflection* true)
+
 (def options
   "The default options for the Flexmark parser
   There shouldn't be a reason to change this"
@@ -39,6 +42,16 @@
   "The instance of the Flexmark parser.
   Can be called like `(.parse parser document-string)` to yeild a `document` Flexmark parse object"
   (.build (Parser/builder options)))
+
+(defn parse
+  "Invoke the native parser"
+  [md]
+  (.parse ^Parser parser ^String md))
+
+(defn parse-rdr
+  "Invoke the native parser, but on a Reader"
+  [md-rdr]
+  (.parseReader ^Parser parser ^Reader md-rdr))
 
 (defn print-ast
   "Utility function to print the AST. Consumes the `document` from the parser"
@@ -78,7 +91,7 @@
   (to-hiccup [this _]))
 
 (defn map-children-to-hiccup [node source]
-  (map #(to-hiccup % source) (.getChildren node)))
+  (map #(to-hiccup % source) (.getChildren ^Node node)))
 
 (extend-protocol HiccupRepresentable
   Node

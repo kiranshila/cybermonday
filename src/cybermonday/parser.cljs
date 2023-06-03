@@ -15,6 +15,11 @@
                 (use math)
                 (use gfm)))
 
+(defn parse
+  "Invoke the native parser"
+  [md]
+  (.parse parser md))
+
 (def node-tags
   "The default mapping from Flexmark AST node to Hiccup tag"
   {"root" :div

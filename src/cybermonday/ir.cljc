@@ -5,6 +5,8 @@
    [clojure.string :as str]
    [clojure.walk :as walk]))
 
+#?(:clj (set! *warn-on-reflection* true))
+
 ;; HTML Processing
 
 (defn close-tag? [tag]
@@ -79,10 +81,20 @@
 
 ;; IR Generation
 
+(defn ast-to-ir
+  "Trasnforms a backend-native ast to IR"
+  [ast source]
+  (process-inline-html (parser/to-hiccup ast source)))
+
 (defn md-to-ir
   "Given `md` as a string, generates a Cybermonday hiccup IR
   Inline HTML gets folded inplace and excess whitespace is removed"
   [md]
-  (let [document (.parse parser/parser md)]
-    (->> (parser/to-hiccup document md)
-         process-inline-html)))
+  (ast-to-ir (parser/parse md) md))
+
+(defn md-rdr-to-ir
+  "Given `md` as an opened reader, generates a Cybermonday hiccup IR (JVM only)
+  Inline HTML gets folded inplace and excess whitespace is removed"
+  [md-rdr]
+  #?(:clj (ast-to-ir (parser/parse-rdr md-rdr) md-rdr)
+     :cljs (throw (js/Error. "Unimplemented"))))
