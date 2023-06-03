@@ -10,8 +10,9 @@
   {:markdown/hard-line-break :br
    :markdown/inline-math :code
    :markdown/html-comment nil
-   :markdown/soft-line-break nil
    :markdown/reference nil})
+
+(defn lower-soft-line-break [[_]] "\n")
 
 (defn lower-heading [[_ attrs & body :as node]]
   (make-hiccup-node
@@ -95,10 +96,10 @@
                                                           :cljs #(js/parseInt %)) x))))]
                 (reduce (fn [acc item]
                           (cond
-                           (= 1 (count item)) (conj acc (first item))
-                           (= 2 (count item)) (apply conj acc (range (first item)
-                                                                     (+ 1 (second item))))
-                           :else (reduced nil)))
+                            (= 1 (count item)) (conj acc (first item))
+                            (= 2 (count item)) (apply conj acc (range (first item)
+                                                                      (+ 1 (second item))))
+                            :else (reduced nil)))
                         #{}
                         levels-list))
               (catch #?(:clj Throwable :cljs :default) _ nil)))
@@ -117,7 +118,7 @@
                   ;; append the new heading to the children vector containing this heading
                   (if (or (not heading) (< insert-level level)) (pop heading-path)
                     ;; Else look at the last top-level heading in this heading's children next
-                    (recur (conj heading-path :children (- node-children-count 1))))))))
+                      (recur (conj heading-path :children (- node-children-count 1))))))))
           (heading->hiccup [{:keys [children title id]}]
             [:li [:a {:href (str "#" id)} title]
              (when children (into [:ul] children))])]
@@ -165,7 +166,8 @@
    :markdown/image-ref lower-image-ref
    :markdown/bullet-list-item lower-list-item
    :markdown/ordered-list-item lower-list-item
-   :markdown/table-of-contents lower-toc})
+   :markdown/table-of-contents lower-toc
+   :markdown/soft-line-break lower-soft-line-break})
 
 (defn lower-ir
   "Transforms the IR tree by lowering nodes to their HTML representation"

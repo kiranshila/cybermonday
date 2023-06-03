@@ -6,6 +6,16 @@
 
 (t/deftest ir
   (t/testing "Parsing to IR"
+    (t/testing "Line Breaks"
+      (t/is (= [:div {} [:p {}
+                         "This is a test"
+                         [:markdown/soft-line-break {}]
+                         "of some content"]]
+               (ir/md-to-ir "This is a test\nof some content")))
+      (t/is (= [:div {}
+                [:p {} "This is a test"]
+                [:p {} "of some content"]]
+               (ir/md-to-ir "This is a test\n\nof some content"))))
     (t/testing "Paragraphs"
       (t/is (= [:div {} [:p {} "aaa"] [:p {} "bbb"]] (ir/md-to-ir "aaa\n\nbbb")))
       (t/is (= [:div {} [:p {} "aaabbb"]] (ir/md-to-ir "  aaabbb")))
@@ -116,6 +126,9 @@
 (t/deftest html-lowering
   (t/testing "Parsing to HTML"
     ; TODO - Run all the commonmark tests
+    (t/testing "Line Breaks"
+      (t/is (= [:div {} [:p {} "This is a test" "\n" "of some content"]]
+               (cm/parse-body "This is a test\nof some content"))))
     (t/testing "List Items"
       (t/is (= [:div {}
                 [:ul {}
