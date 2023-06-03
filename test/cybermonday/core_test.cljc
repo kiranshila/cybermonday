@@ -7,10 +7,11 @@
 (t/deftest ir
   (t/testing "Parsing to IR"
     (t/testing "Line Breaks"
-      (t/is (= [:div {} [:p {}
-                         "This is a test"
-                         [:markdown/soft-line-break {}]
-                         "of some content"]]
+      (t/is (= [:div {} #?(:clj [:p {}
+                                 "This is a test"
+                                 [:markdown/soft-line-break {}]
+                                 "of some content"]
+                           :cljs  [:p {} "This is a test\nof some content"])]
                (ir/md-to-ir "This is a test\nof some content")))
       (t/is (= [:div {}
                 [:p {} "This is a test"]
@@ -29,11 +30,17 @@
                          [:p {} "foo"]
                          [:p {} "bar"]]]
                (ir/md-to-ir "> foo\n>\n> bar")))
-      #_(t/is (= [:div {} [:blockquote {} ;; Softline breaks are not working in JS
-                           [:blockquote {}
-                            [:blockquote {}
-                             [:p {} "foo\nbar\nbaz"]]]]]
-                 (ir/md-to-ir ">>> foo\n> bar\n>>baz"))))
+      (t/is (= [:div {} [:blockquote {}
+                         [:blockquote {}
+                          [:blockquote {}
+                           #?(:clj [:p {}
+                                    "foo"
+                                    [:markdown/soft-line-break {}]
+                                    "bar"
+                                    [:markdown/soft-line-break {}]
+                                    "baz"]
+                              :cljs [:p {} "foo\nbar\nbaz"])]]]]
+               (ir/md-to-ir ">>> foo\n> bar\n>>baz"))))
     (t/testing "List Items"
       (t/is (= [:div {} [:ol {}
                          [:markdown/ordered-list-item {} [:p {} "One"]]
@@ -107,7 +114,7 @@
       (t/is (= [:div {} [:p {} [:markdown/mail-link {:address "me@kiranshila.com"}]]] (ir/md-to-ir "<me@kiranshila.com>"))))
     (t/testing "Images"
       (t/is (= [:div {} [:p {} [:img {:alt "foo" :src "/url" :title "title"}]]] (ir/md-to-ir "![foo](/url \"title\")")))
-      #_(t/is (= [:div {} [:p {} ;; Complex image ref example broken in js
+      #_(t/is (= [:div {} [:p {} ;; Complex image ref broken in JS
                            [:markdown/image-ref
                             {:reference
                              [:markdown/reference {:label "foo *bar*"
@@ -127,7 +134,8 @@
   (t/testing "Parsing to HTML"
     ; TODO - Run all the commonmark tests
     (t/testing "Line Breaks"
-      (t/is (= [:div {} [:p {} "This is a test" "\n" "of some content"]]
+      (t/is (= #?(:clj [:div {} [:p {} "This is a test" "\n" "of some content"]]
+                  :cljs [:div {} [:p {} "This is a test\nof some content"]])
                (cm/parse-body "This is a test\nof some content"))))
     (t/testing "List Items"
       (t/is (= [:div {}
