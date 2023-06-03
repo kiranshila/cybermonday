@@ -19,7 +19,7 @@
                        :extra-deps {thheller/shadow-cljs {:mvn/version "2.20.14"}}
                        :main-opts ["-m" "shadow.cljs.devtools.cli" "release" "test"]}
            :test-clj {:extra-paths ["test"]
-                      :extra-deps {lambdaisland/kaocha {:mvn/version "1.71.1119"}
+                      :extra-deps {lambdaisland/kaocha {:mvn/version "1.84.1335"}
                                    lambdaisland/kaocha-junit-xml {:mvn/version "1.17.101"}
                                    lambdaisland/kaocha-cloverage {:mvn/version "1.1.89"}}
                       :main-opts ["-m" "kaocha.runner"]}
