@@ -13,10 +13,10 @@ Try it out here on the [test app](https://kiranshila.github.io/cybermonday-test-
 
 ## Usage
 
-Simply add this library to your Clojure(Script) project, grab some markdown as a string, and run
+Simply add this library to your Clojure(Script) project, grab some markdown as a string (or as an opened reader (JVM)), and run
 
 ```clojure
-(cybermonday.core/parse-md my-markdown-str)
+(cybermonday.core/parse-md my-markdown)
 ```
 
 to get an HTML hiccup representation of your markdown.
@@ -42,6 +42,12 @@ For example, say we want to use a react component from Reagent to render math an
 (cm/parse-md markdown {:default-attrs {:p {:class ["my-class"]}}
                        :lower-fns {:markdown/inline-math lower-inline-math}}
 ```
+
+## Ecosysytem Compatibility
+
+As of 0.6.x, cybermonday supports compilation to a native-image with GraalVM! See [the cli example](https://github.com/kiranshila/cybermonday-cli-graal) for more information.
+
+We also support CLJS/NBB.
 
 ## Motivation
 
@@ -87,7 +93,7 @@ Flexmark now has a hard dependency on Java 11 - for which is carried over here. 
 
 ## License
 
-Copyright © 2022 Kiran Shila
+Copyright © 2023 Kiran Shila
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
