@@ -5,7 +5,7 @@
 
 (def scm-url "git@github.com:kiranshila/cybermonday.git")
 (def lib 'com.kiranshila/cybermonday)
-(def version (format "0.5.%s" (b/git-count-revs nil)))
+(def version (format "0.6.%s" (b/git-count-revs nil)))
 (def class-dir "target/classes")
 (def basis (b/create-basis {:project "deps.edn"}))
 (def jar-file (format "target/%s-%s.jar" (name lib) version))
